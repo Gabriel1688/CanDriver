@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <linux/can.h>
-#include <linux/can/raw.h>
+//#include <linux/can.h>
+//#include <linux/can/raw.h>
 
 #include <iostream>
 #include <openarm/can/socket/openarm.hpp>
@@ -22,7 +22,7 @@ namespace openarm::can::socket {
 
 OpenArm::OpenArm(const std::string& can_interface, bool enable_fd)
     : can_interface_(can_interface), enable_fd_(enable_fd) {
-    can_socket_ = std::make_unique<canbus::CANSocket>(can_interface_, enable_fd_);
+    can_socket_ = std::make_unique<canbus::CANSocket_Ex>(can_interface_, enable_fd_);
     master_can_device_collection_ = std::make_unique<canbus::CANDeviceCollection>(*can_socket_);
     arm_ = std::make_unique<ArmComponent>(*can_socket_);
     gripper_ = std::make_unique<GripperComponent>(*can_socket_);
@@ -89,16 +89,8 @@ void OpenArm::recv_all(int timeout_us) {
     // The timeout for select() is set to timeout_us (default: 500 us).
     // Tuning this value may improve the performance but should be done with caution.
 
-    // CAN FD
-    if (enable_fd_) {
-        canfd_frame response_frame;
-        while (can_socket_->is_data_available(timeout_us) &&
-               can_socket_->read_canfd_frame(response_frame)) {
-            master_can_device_collection_->dispatch_frame_callback(response_frame);
-        }
-    }
     // CAN 2.0
-    else {
+    {
         can_frame response_frame;
         while (can_socket_->is_data_available(timeout_us) &&
                can_socket_->read_can_frame(response_frame)) {

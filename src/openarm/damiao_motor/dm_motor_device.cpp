@@ -31,9 +31,6 @@ std::vector<uint8_t> DMCANDevice::get_data_from_frame(const can_frame& frame) {
     return std::vector<uint8_t>(frame.data, frame.data + frame.can_dlc);
 }
 
-std::vector<uint8_t> DMCANDevice::get_data_from_frame(const canfd_frame& frame) {
-    return std::vector<uint8_t>(frame.data, frame.data + frame.len);
-}
 void DMCANDevice::callback(const can_frame& frame) {
     if (use_fd_) {
         std::cerr << "WARNING: WRONG CALLBACK FUNCTION" << std::endl;
@@ -67,34 +64,6 @@ void DMCANDevice::callback(const can_frame& frame) {
     }
 }
 
-void DMCANDevice::callback(const canfd_frame& frame) {
-    if (not use_fd_) {
-        std::cerr << "WARNING: CANFD MODE NOT ENABLED" << std::endl;
-        return;
-    }
-
-    if (frame.can_id != motor_.get_recv_can_id()) {
-        std::cerr << "WARNING: CANFD FRAME ID DOES NOT MATCH MOTOR ID" << std::endl;
-        return;
-    }
-
-    std::vector<uint8_t> data = get_data_from_frame(frame);
-    if (callback_mode_ == STATE) {
-        StateResult result = CanPacketDecoder::parse_motor_state_data(motor_, data);
-        if (result.valid) {
-            motor_.update_state(result.position, result.velocity, result.torque, result.t_mos,
-                                result.t_rotor);
-        }
-    } else if (callback_mode_ == PARAM) {
-        ParamResult result = CanPacketDecoder::parse_motor_param_data(data);
-        if (result.valid) {
-            motor_.set_temp_param(result.rid, result.value);
-        }
-    } else if (callback_mode_ == IGNORE) {
-        return;
-    }
-}
-
 can_frame DMCANDevice::create_can_frame(canid_t send_can_id, std::vector<uint8_t> data) {
     can_frame frame;
     std::memset(&frame, 0, sizeof(frame));
@@ -103,14 +72,4 @@ can_frame DMCANDevice::create_can_frame(canid_t send_can_id, std::vector<uint8_t
     std::copy(data.begin(), data.end(), frame.data);
     return frame;
 }
-
-canfd_frame DMCANDevice::create_canfd_frame(canid_t send_can_id, std::vector<uint8_t> data) {
-    canfd_frame frame;
-    frame.can_id = send_can_id;
-    frame.len = data.size();
-    frame.flags = CANFD_BRS;
-    std::copy(data.begin(), data.end(), frame.data);
-    return frame;
-}
-
 }  // namespace openarm::damiao_motor

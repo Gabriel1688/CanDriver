@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <linux/can.h>
-#include <linux/can/raw.h>
+//#include <linux/can.h>
+//#include <linux/can/raw.h>
 
 #include <iostream>
 #include <openarm/can/socket/arm_component.hpp>
 
 namespace openarm::can::socket {
 
-ArmComponent::ArmComponent(canbus::CANSocket& can_socket)
+ArmComponent::ArmComponent(canbus::CANSocket_Ex& can_socket)
     : damiao_motor::DMDeviceCollection(can_socket) {}
 
 void ArmComponent::init_motor_devices(const std::vector<damiao_motor::MotorType>& motor_types,
@@ -35,7 +35,7 @@ void ArmComponent::init_motor_devices(const std::vector<damiao_motor::MotorType>
         motors_.emplace_back(motor_types[i], send_can_ids[i], recv_can_ids[i]);
         // Then create the device with a reference to the stored motor
         auto motor_device =
-            std::make_shared<damiao_motor::DMCANDevice>(motors_.back(), CAN_SFF_MASK, use_fd);
+            std::make_shared<damiao_motor::DMCANDevice>(motors_.back(), 0x000007FFU/*CAN_SFF_MASK*/, use_fd);
         get_device_collection().add_device(motor_device);
     }
 }

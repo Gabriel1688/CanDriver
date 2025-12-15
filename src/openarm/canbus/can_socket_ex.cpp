@@ -22,20 +22,32 @@
 #include <unistd.h>
 
 #include <iostream>
-#include <openarm/canbus/can_socket.hpp>
+#include <openarm/canbus/can_socket_ex.hpp>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#include <errno.h>
+#include <netdb.h>
+#include <string.h>
+#include <sys/epoll.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
 
 namespace openarm::canbus {
 
-CANSocket::CANSocket(const std::string& interface, bool enable_fd)
+CANSocket_Ex::CANSocket_Ex(const std::string& interface, bool enable_fd)
     : socket_fd_(-1), interface_(interface), fd_enabled_(enable_fd) {
+    address="127.0.0.1";
+    port = 1180;
     if (!initialize_socket(interface)) {
         throw CANSocketException("Failed to initialize socket for interface: " + interface);
     }
 }
 
-CANSocket::~CANSocket() { cleanup(); }
-
-bool CANSocket::initialize_socket(const std::string& interface) {
+CANSocket_Ex::~CANSocket_Ex() { cleanup(); }
+#if 0
+bool CANSocket_Ex::initialize_socket(const std::string& interface) {
     // Create socket
     socket_fd_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if (socket_fd_ < 0) {
@@ -80,45 +92,71 @@ bool CANSocket::initialize_socket(const std::string& interface) {
 
     return true;
 }
+#endif
+bool CANSocket_Ex::initialize_socket(const std::string& interface) {
+    // Create socket
+    struct sockaddr_in _server;
+    try {
+        socket_fd_ = socket(AF_INET , SOCK_STREAM , 0);
 
-void CANSocket::cleanup() {
+        const int inetSuccess = inet_aton(address.c_str(), &_server.sin_addr);
+
+        if(!inetSuccess) { // inet_addr failed to parse address
+            // if hostname is not in IP strings and dots format, try resolve it
+            struct hostent *host;
+            struct in_addr **addrList;
+            if ( (host = gethostbyname( address.c_str() ) ) == nullptr){
+                throw std::runtime_error("Failed to resolve hostname");
+            }
+            addrList = (struct in_addr **) host->h_addr_list;
+            _server.sin_addr = *addrList[0];
+        }
+        _server.sin_family = AF_INET;
+        _server.sin_port = htons(port);
+    } catch (const std::runtime_error& error) {
+        std::cout << "server is already closed"<< error.what() << std::endl;
+        return false;
+    }
+
+    const int connectResult = connect(socket_fd_ , (struct sockaddr *)&_server , sizeof(_server));
+    if (connectResult ==  -1) {
+        std::cout << "server is already closed, "<< strerror(errno) << std::endl;
+        return false;
+    }
+//    _isConnected = true;
+//    _isClosed = false;
+    return true;
+}
+
+
+void CANSocket_Ex::cleanup() {
     if (socket_fd_ >= 0) {
         close(socket_fd_);
         socket_fd_ = -1;
     }
 }
 
-ssize_t CANSocket::read_raw_frame(void* buffer, size_t buffer_size) {
+ssize_t CANSocket_Ex::read_raw_frame(void* buffer, size_t buffer_size) {
     if (!is_initialized()) return -1;
     return read(socket_fd_, buffer, buffer_size);
 }
 
-ssize_t CANSocket::write_raw_frame(const void* buffer, size_t frame_size) {
+ssize_t CANSocket_Ex::write_raw_frame(const void* buffer, size_t frame_size) {
     if (!is_initialized()) return -1;
     return write(socket_fd_, buffer, frame_size);
 }
 
-bool CANSocket::write_can_frame(const can_frame& frame) {
+bool CANSocket_Ex::write_can_frame(const can_frame& frame) {
     return write(socket_fd_, &frame, sizeof(frame)) == sizeof(frame);
 }
 
-bool CANSocket::write_canfd_frame(const canfd_frame& frame) {
-    return write(socket_fd_, &frame, sizeof(frame)) == sizeof(frame);
-}
-
-bool CANSocket::read_can_frame(can_frame& frame) {
+bool CANSocket_Ex::read_can_frame(can_frame& frame) {
     if (!is_initialized()) return false;
     ssize_t bytes_read = read(socket_fd_, &frame, sizeof(frame));
     return bytes_read == sizeof(frame);
 }
 
-bool CANSocket::read_canfd_frame(canfd_frame& frame) {
-    if (!is_initialized()) return false;
-    ssize_t bytes_read = read(socket_fd_, &frame, sizeof(frame));
-    return bytes_read == sizeof(frame);
-}
-
-bool CANSocket::is_data_available(int timeout_us) {
+bool CANSocket_Ex::is_data_available(int timeout_us) {
     if (!is_initialized()) return false;
 
     fd_set read_fds;

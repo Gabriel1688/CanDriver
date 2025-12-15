@@ -14,8 +14,9 @@
 
 #pragma once
 
+#include "../canbus/common.h"
 #include "../canbus/can_device.hpp"
-#include "../canbus/can_socket.hpp"
+#include "../canbus/can_socket_ex.hpp"
 #include "dm_motor.hpp"
 #include "dm_motor_control.hpp"
 
@@ -31,18 +32,15 @@ class DMCANDevice : public canbus::CANDevice {
 public:
     explicit DMCANDevice(Motor& motor, canid_t recv_can_mask, bool use_fd);
     void callback(const can_frame& frame);
-    void callback(const canfd_frame& frame);
 
     // Create frame from data array
     can_frame create_can_frame(canid_t send_can_id, std::vector<uint8_t> data);
-    canfd_frame create_canfd_frame(canid_t send_can_id, std::vector<uint8_t> data);
     // Getter method to access motor state
     Motor& get_motor() { return motor_; }
     void set_callback_mode(CallbackMode callback_mode) { callback_mode_ = callback_mode; }
 
 private:
     std::vector<uint8_t> get_data_from_frame(const can_frame& frame);
-    std::vector<uint8_t> get_data_from_frame(const canfd_frame& frame);
     Motor& motor_;
     CallbackMode callback_mode_;
     bool use_fd_;  // Track if using CAN-FD

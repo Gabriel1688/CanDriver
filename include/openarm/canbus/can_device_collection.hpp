@@ -20,24 +20,24 @@
 #include <vector>
 
 #include "can_device.hpp"
-#include "can_socket.hpp"
+//#include "can_socket.hpp"
+#include "can_socket_ex.hpp"
 
 namespace openarm::canbus {
 class CANDeviceCollection {
 public:
-    CANDeviceCollection(canbus::CANSocket& can_socket);
+    CANDeviceCollection(canbus::CANSocket_Ex& can_socket);
     ~CANDeviceCollection();
 
     void add_device(const std::shared_ptr<CANDevice>& device);
     void remove_device(const std::shared_ptr<CANDevice>& device);
     void dispatch_frame_callback(can_frame& frame);
-    void dispatch_frame_callback(canfd_frame& frame);
     const std::map<canid_t, std::shared_ptr<CANDevice>>& get_devices() const { return devices_; }
-    canbus::CANSocket& get_can_socket() const { return can_socket_; }
+    canbus::CANSocket_Ex& get_can_socket() const { return can_socket_; }
     int get_socket_fd() const { return can_socket_.get_socket_fd(); }
 
 private:
-    canbus::CANSocket& can_socket_;
+    canbus::CANSocket_Ex& can_socket_;
     std::map<canid_t, std::shared_ptr<CANDevice>> devices_;
 };
 }  // namespace openarm::canbus

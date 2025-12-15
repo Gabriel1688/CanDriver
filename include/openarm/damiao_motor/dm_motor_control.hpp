@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <linux/can.h>
+//#include <linux/can.h>
 
 #include <cstdint>
 #include <cstring>  // for memcpy
@@ -22,6 +22,7 @@
 #include <map>
 #include <vector>
 
+#include "../canbus/common.h"
 #include "dm_motor.hpp"
 #include "dm_motor_constants.hpp"
 

@@ -35,7 +35,7 @@ add_library(
   src/openarm/can/socket/gripper_component.cpp
   src/openarm/can/socket/openarm.cpp
   src/openarm/canbus/can_device_collection.cpp
-  src/openarm/canbus/can_socket.cpp
+  src/openarm/canbus/can_socket_ex.cpp
   src/openarm/damiao_motor/dm_motor.cpp
   src/openarm/damiao_motor/dm_motor_control.cpp
   src/openarm/damiao_motor/dm_motor_device.cpp
@@ -65,7 +65,8 @@ if(USE_FILE_SET_HEADERS)
            include/openarm/can/socket/openarm.hpp
            include/openarm/canbus/can_device.hpp
            include/openarm/canbus/can_device_collection.hpp
-           include/openarm/canbus/can_socket.hpp
+           include/openarm/canbus/can_socket_ex.hpp
+           include/openarm/canbus/common.h
            include/openarm/damiao_motor/dm_motor.hpp
            include/openarm/damiao_motor/dm_motor_constants.hpp
            include/openarm/damiao_motor/dm_motor_control.hpp

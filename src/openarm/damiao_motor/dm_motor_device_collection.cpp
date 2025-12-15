@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <linux/can.h>
-#include <linux/can/raw.h>
+//#include <linux/can.h>
+//#include <linux/can/raw.h>
 
 #include <iostream>
+#include <openarm/canbus/common.h>
 #include <openarm/damiao_motor/dm_motor_device_collection.hpp>
 
 namespace openarm::damiao_motor {
 
-DMDeviceCollection::DMDeviceCollection(canbus::CANSocket& can_socket)
+DMDeviceCollection::DMDeviceCollection(canbus::CANSocket_Ex& can_socket)
     : can_socket_(can_socket),
       can_packet_encoder_(std::make_unique<CanPacketEncoder>()),
       can_packet_decoder_(std::make_unique<CanPacketDecoder>()),
@@ -91,10 +92,7 @@ void DMDeviceCollection::query_param_all(int RID) {
 
 void DMDeviceCollection::send_command_to_device(std::shared_ptr<DMCANDevice> dm_device,
                                                 const CANPacket& packet) {
-    if (can_socket_.is_canfd_enabled()) {
-        canfd_frame frame = dm_device->create_canfd_frame(packet.send_can_id, packet.data);
-        can_socket_.write_canfd_frame(frame);
-    } else {
+    {
         can_frame frame = dm_device->create_can_frame(packet.send_can_id, packet.data);
         can_socket_.write_can_frame(frame);
     }

@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <linux/can.h>
-#include <linux/can/raw.h>
+//#include <linux/can.h>
+//#include <linux/can/raw.h>
 
 #include <iostream>
+#include <openarm/canbus/common.h>
 #include <openarm/can/socket/gripper_component.hpp>
 
 namespace openarm::can::socket {
 
-GripperComponent::GripperComponent(canbus::CANSocket& can_socket)
+GripperComponent::GripperComponent(canbus::CANSocket_Ex& can_socket)
     : DMDeviceCollection(can_socket) {}
 
 void GripperComponent::init_motor_device(damiao_motor::MotorType motor_type, uint32_t send_can_id,

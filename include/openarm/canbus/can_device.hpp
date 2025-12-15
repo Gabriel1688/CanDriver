@@ -14,12 +14,12 @@
 
 #pragma once
 
-#include <linux/can.h>
-#include <linux/can/raw.h>
+//#include <linux/can.h>
+//#include <linux/can/raw.h>
 
 #include <cstdint>
 #include <vector>
-
+#include "common.h"
 namespace openarm::canbus {
 // Abstract base class for CAN devices
 class CANDevice {
@@ -33,7 +33,6 @@ public:
     virtual ~CANDevice() = default;
 
     virtual void callback(const can_frame& frame) = 0;
-    virtual void callback(const canfd_frame& frame) = 0;
 
     canid_t get_send_can_id() const { return send_can_id_; }
     canid_t get_recv_can_id() const { return recv_can_id_; }
@@ -44,7 +43,7 @@ protected:
     canid_t send_can_id_;
     canid_t recv_can_id_;
     // mask for receiving
-    canid_t recv_can_mask_ = CAN_SFF_MASK;
+    canid_t recv_can_mask_ =0x000007FFU; // CAN_SFF_MASK;
     bool is_fd_enabled_ = false;
 };
 }  // namespace openarm::canbus

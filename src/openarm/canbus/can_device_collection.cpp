@@ -14,11 +14,11 @@
 
 #include <iostream>
 #include <openarm/canbus/can_device_collection.hpp>
-#include <openarm/canbus/can_socket.hpp>
+#include <openarm/canbus/can_socket_ex.hpp>
 
 namespace openarm::canbus {
 
-CANDeviceCollection::CANDeviceCollection(CANSocket& can_socket) : can_socket_(can_socket) {}
+CANDeviceCollection::CANDeviceCollection(CANSocket_Ex& can_socket) : can_socket_(can_socket) {}
 
 CANDeviceCollection::~CANDeviceCollection() {}
 
@@ -49,14 +49,4 @@ void CANDeviceCollection::dispatch_frame_callback(can_frame& frame) {
     // Note: Silently ignore frames for unknown devices (this is normal in CAN
     // networks)
 }
-
-void CANDeviceCollection::dispatch_frame_callback(canfd_frame& frame) {
-    auto it = devices_.find(frame.can_id);
-    if (it != devices_.end()) {
-        it->second->callback(frame);
-    }
-    // Note: Silently ignore frames for unknown devices (this is normal in CAN
-    // networks)
-}
-
 }  // namespace openarm::canbus
