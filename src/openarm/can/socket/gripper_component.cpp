@@ -25,11 +25,11 @@ GripperComponent::GripperComponent(canbus::CANSocket_Ex& can_socket)
     : DMDeviceCollection(can_socket) {}
 
 void GripperComponent::init_motor_device(damiao_motor::MotorType motor_type, uint32_t send_can_id,
-                                         uint32_t recv_can_id, bool use_fd) {
+                                         uint32_t recv_can_id) {
     // Create the motor
     motor_ = std::make_unique<damiao_motor::Motor>(motor_type, send_can_id, recv_can_id);
     // Create the device with a reference to the motor
-    motor_device_ = std::make_shared<damiao_motor::DMCANDevice>(*motor_, CAN_SFF_MASK, use_fd);
+    motor_device_ = std::make_shared<damiao_motor::DMCANDevice>(*motor_, CAN_SFF_MASK);
     get_device_collection().add_device(motor_device_);
 }
 

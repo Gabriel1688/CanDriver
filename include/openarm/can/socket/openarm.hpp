@@ -30,7 +30,6 @@ public:
     ~OpenArm() = default;
 
     std::string can_interface() const noexcept { return can_interface_; }
-    bool can_fd_enabled() const noexcept { return enable_fd_; }
 
     // Component initialization
     void init_arm_motors(const std::vector<damiao_motor::MotorType>& motor_types,
@@ -62,7 +61,6 @@ public:
 
 private:
     std::string can_interface_;
-    bool enable_fd_;
     std::unique_ptr<canbus::CANSocket_Ex> can_socket_;
     //std::unique_ptr<canbus::CANSocket> can_socket_;
     std::unique_ptr<ArmComponent> arm_;

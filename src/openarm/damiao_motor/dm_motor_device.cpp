@@ -1,19 +1,3 @@
-// Copyright 2025 Enactic, Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-#include <cmath>
-#include <iostream>
 #include <openarm/damiao_motor/dm_motor.hpp>
 #include <openarm/damiao_motor/dm_motor_constants.hpp>
 #include <openarm/damiao_motor/dm_motor_control.hpp>
@@ -21,22 +5,16 @@
 
 namespace openarm::damiao_motor {
 
-DMCANDevice::DMCANDevice(Motor& motor, canid_t recv_can_mask, bool use_fd)
-    : canbus::CANDevice(motor.get_send_can_id(), motor.get_recv_can_id(), recv_can_mask, use_fd),
+DMCANDevice::DMCANDevice(Motor& motor, canid_t recv_can_mask)
+    : canbus::CANDevice(motor.get_send_can_id(), motor.get_recv_can_id(), recv_can_mask),
       motor_(motor),
-      callback_mode_(CallbackMode::STATE),
-      use_fd_(use_fd) {}
+      callback_mode_(CallbackMode::STATE) {}
 
 std::vector<uint8_t> DMCANDevice::get_data_from_frame(const can_frame& frame) {
     return std::vector<uint8_t>(frame.data, frame.data + frame.can_dlc);
 }
 
 void DMCANDevice::callback(const can_frame& frame) {
-    if (use_fd_) {
-        std::cerr << "WARNING: WRONG CALLBACK FUNCTION" << std::endl;
-        return;
-    }
-
     std::vector<uint8_t> data = get_data_from_frame(frame);
 
     switch (callback_mode_) {

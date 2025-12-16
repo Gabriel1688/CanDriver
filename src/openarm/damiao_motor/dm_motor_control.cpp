@@ -1,23 +1,8 @@
-// Copyright 2025 Enactic, Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #include <cmath>
 #include <cstring>
 #include <openarm/damiao_motor/dm_motor.hpp>
 #include <openarm/damiao_motor/dm_motor_constants.hpp>
 #include <openarm/damiao_motor/dm_motor_control.hpp>
-#include <thread>
 
 namespace openarm::damiao_motor {
 
@@ -73,8 +58,7 @@ StateResult CanPacketDecoder::parse_motor_state_data(const Motor& motor,
 
     // Parse state data
     uint16_t q_uint = (static_cast<uint16_t>(data[1]) << 8) | data[2];
-    uint16_t dq_uint =
-        (static_cast<uint16_t>(data[3]) << 4) | (static_cast<uint16_t>(data[4]) >> 4);
+    uint16_t dq_uint = (static_cast<uint16_t>(data[3]) << 4) | (static_cast<uint16_t>(data[4]) >> 4);
     uint16_t tau_uint = (static_cast<uint16_t>(data[4] & 0xf) << 8) | data[5];
     int t_mos = static_cast<int>(data[6]);
     int t_rotor = static_cast<int>(data[7]);
