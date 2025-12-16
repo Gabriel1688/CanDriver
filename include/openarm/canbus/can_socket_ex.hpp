@@ -32,6 +32,12 @@
 
 namespace openarm::canbus {
 
+struct client_observer_t {
+    int id = 0;
+    std::function<void(const can_frame& frame)> incomingPacketHandler = nullptr;
+    std::function<void(const std::string & ret)> disconnectionHandler = nullptr;
+    bool completed=false;
+};
 // Base socket management class
 class CANSocket_Ex {
 public:
@@ -61,7 +67,7 @@ public:
 
     // check if data is available for reading (non-blocking)
     bool is_data_available(int timeout_us = 100);
-
+    void subscribe(const int32_t deviceId, const client_observer_t & observer);
 protected:
     bool initialize_socket(const std::string& interface);
     void cleanup();
@@ -74,13 +80,15 @@ protected:
      * from clients with IP address identical to
      * the specific observer requested IP
      */
-    void handlereceivedMsg(const char * msg, size_t msgSize);
+    void handlereceivedMsg(const can_frame_ex& frame, size_t msgSize);
     std::string address;
     int port;
     int socket_fd_;
     std::string interface_;
     pthread_t thread_id;
     bool isConnected_;
+    std::mutex _subscribersMtx;
+    std::map<int32_t, client_observer_t> _subscribers;
 };
 
 }  // namespace openarm::canbus

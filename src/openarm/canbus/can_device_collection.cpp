@@ -18,7 +18,15 @@
 
 namespace openarm::canbus {
 
-CANDeviceCollection::CANDeviceCollection(CANSocket_Ex& can_socket) : can_socket_(can_socket) {}
+CANDeviceCollection::CANDeviceCollection(CANSocket_Ex& can_socket) : can_socket_(can_socket) {
+    // configure and register to can socket
+    client_observer_t observer;
+    observer.id = 0x11;
+    observer.incomingPacketHandler = std::bind(&CANDeviceCollection::dispatch_frame_callback, this, std::placeholders::_1);
+    observer.disconnectionHandler  = nullptr;
+
+    can_socket.subscribe(observer.id, observer);
+}
 
 CANDeviceCollection::~CANDeviceCollection() {}
 
@@ -41,7 +49,7 @@ void CANDeviceCollection::remove_device(const std::shared_ptr<CANDevice>& device
     }
 }
 
-void CANDeviceCollection::dispatch_frame_callback(can_frame& frame) {
+void CANDeviceCollection::dispatch_frame_callback(const can_frame& frame) {
     auto it = devices_.find(frame.can_id);
     if (it != devices_.end()) {
         it->second->callback(frame);

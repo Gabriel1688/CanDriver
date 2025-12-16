@@ -26,6 +26,9 @@ void DMCANDevice::callback(const can_frame& frame) {
                     motor_.update_state(result.position, result.velocity, result.torque,
                                         result.t_mos, result.t_rotor);
                 }
+                else {
+                    std::cout <<"Callback mode [STATE] : invalid message: " << frame.can_id << std::endl;
+                }
             }
             break;
         case PARAM: {
@@ -33,9 +36,13 @@ void DMCANDevice::callback(const can_frame& frame) {
             if (result.valid) {
                 motor_.set_temp_param(result.rid, result.value);
             }
+            else {
+                std::cout <<"Callback mode [PARAM] : invalid message: " << frame.can_id << std::endl;
+            }
             break;
         }
         case IGNORE:
+            std::cout <<"Callback mode [IGNORE] message : can_id: " << frame.can_id << std::endl;
             return;
         default:
             break;

@@ -117,7 +117,7 @@ void CANSocket_Ex::run() {
                         //publishServerDisconnected(errorMsg);
                         return;
                     } else {
-                        //handlereceivedMsg(msg,bytes_read);
+                        handlereceivedMsg(frame,bytes_read);
                     }
                 }
             }
@@ -126,17 +126,24 @@ void CANSocket_Ex::run() {
     }
 }
 
-void CANSocket_Ex::handlereceivedMsg(const char * msg, size_t msgSize) {
-    std::cout << "Received server data, size : " << msgSize << std::endl;
-    for(int i = 0; i < msgSize; i++) {
-        std::cout << "data [" << i <<"] = " << std::showbase << std::hex  << (unsigned int) msg[i] << std::endl;
-    }
+void CANSocket_Ex::subscribe(const int32_t deviceId, const client_observer_t & observer) {
+    std::lock_guard<std::mutex> lock(_subscribersMtx);
+    _subscribers.insert(std::make_pair(deviceId,observer));
+}
 
-//    can_frame frame;
-//    frame.can_id = msg[0];
-//    frame.can_dlc = 1;
-//    memcpy(frame.data,msg,frame.can_dlc);
-//    std::cout << " can_id: [" << frame.can_id << "]"<< std::endl;
+void CANSocket_Ex::handlereceivedMsg(const can_frame_ex& msg, size_t msgSize) {
+    std::cout << "Received server data, size : " << msgSize << std::endl;
+    can_frame frame;
+    frame.can_id = __builtin_bswap32(msg.FrameId);
+    frame.can_dlc = msgSize -5;  //substract header and frameId, get only the payload
+    memcpy(frame.data,msg.data,frame.can_dlc);
+    std::cout << " can_id: [" << frame.can_id << "]"<< std::endl;
+
+    // call the subscribers for the notification.
+    auto it = _subscribers.find(frame.can_id);
+    if(it != _subscribers.end()) {
+        it->second.incomingPacketHandler(frame);
+    }
 }
 
 void CANSocket_Ex::cleanup() {
