@@ -19,16 +19,13 @@ CANPacket CanPacketEncoder::create_set_zero_command(const Motor& motor) {
     return {motor.get_send_can_id(), pack_command_data(0xFE)};
 }
 
-CANPacket CanPacketEncoder::create_mit_control_command(const Motor& motor,
-                                                       const MITParam& mit_param) {
+CANPacket CanPacketEncoder::create_mit_control_command(const Motor& motor,const MITParam& mit_param) {
     return {motor.get_send_can_id(), pack_mit_control_data(motor.get_motor_type(), mit_param)};
 }
 
-CANPacket CanPacketEncoder::create_posvel_control_command(const Motor& motor,
-                                                          const PosVelParam& posvel_param) {
+CANPacket CanPacketEncoder::create_posvel_control_command(const Motor& motor, const PosVelParam& posvel_param) {
     // pos vel mode needs extra 0x100
-    return {motor.get_send_can_id() + 0x100,
-            pack_posvel_control_data(motor.get_motor_type(), posvel_param)};
+    return {motor.get_send_can_id() + 0x100, pack_posvel_control_data(motor.get_motor_type(), posvel_param)};
 }
 
 CANPacket CanPacketEncoder::create_query_param_command(const Motor& motor, int RID) {
@@ -49,8 +46,7 @@ CANPacket CanPacketEncoder::create_refresh_command(const Motor& motor) {
 }
 
 // Data interpretation methods (use recv_can_id for received data)
-StateResult CanPacketDecoder::parse_motor_state_data(const Motor& motor,
-                                                     const std::vector<uint8_t>& data) {
+StateResult CanPacketDecoder::parse_motor_state_data(const Motor& motor, const std::vector<uint8_t>& data) {
     if (data.size() < 8) {
         std::cerr << "Warning: Skipping motor state data less than 8 bytes" << std::endl;
         return {0, 0, 0, 0, 0, false};
@@ -92,8 +88,7 @@ ParamResult CanPacketDecoder::parse_motor_param_data(const std::vector<uint8_t>&
 }
 
 // Data packing utility methods
-std::vector<uint8_t> CanPacketEncoder::pack_mit_control_data(MotorType motor_type,
-                                                             const MITParam& mit_param) {
+std::vector<uint8_t> CanPacketEncoder::pack_mit_control_data(MotorType motor_type, const MITParam& mit_param) {
     uint16_t kp_uint = double_to_uint(mit_param.kp, 0, 500, 12);
     uint16_t kd_uint = double_to_uint(mit_param.kd, 0, 5, 12);
 
@@ -114,8 +109,7 @@ std::vector<uint8_t> CanPacketEncoder::pack_mit_control_data(MotorType motor_typ
             static_cast<uint8_t>(tau_uint & 0xFF)};
 }
 
-std::vector<uint8_t> CanPacketEncoder::pack_posvel_control_data(MotorType motor_type,
-                                                                const PosVelParam& posvel_param) {
+std::vector<uint8_t> CanPacketEncoder::pack_posvel_control_data(MotorType motor_type, const PosVelParam& posvel_param) {
     double pos = posvel_param.q;
     double vel = posvel_param.dq;
 
@@ -171,8 +165,7 @@ float CanPacketDecoder::uint8s_to_float(const std::array<uint8_t, 4>& bytes) {
     return value;
 }
 
-uint32_t CanPacketDecoder::uint8s_to_uint32(uint8_t byte1, uint8_t byte2, uint8_t byte3,
-                                            uint8_t byte4) {
+uint32_t CanPacketDecoder::uint8s_to_uint32(uint8_t byte1, uint8_t byte2, uint8_t byte3, uint8_t byte4) {
     uint32_t value;
     uint8_t bytes[4] = {byte1, byte2, byte3, byte4};
     std::memcpy(&value, bytes, sizeof(uint32_t));

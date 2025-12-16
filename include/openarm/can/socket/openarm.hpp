@@ -26,7 +26,7 @@
 namespace openarm::can::socket {
 class OpenArm {
 public:
-    OpenArm(const std::string& can_interface, bool enable_fd = false);
+    OpenArm(const std::string& can_interface);
     ~OpenArm() = default;
 
     std::string can_interface() const noexcept { return can_interface_; }

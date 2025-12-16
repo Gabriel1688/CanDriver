@@ -90,10 +90,9 @@ void DMDeviceCollection::query_param_all(int RID) {
     }
 }
 
-void DMDeviceCollection::send_command_to_device(std::shared_ptr<DMCANDevice> dm_device,
-                                                const CANPacket& packet) {
+void DMDeviceCollection::send_command_to_device(std::shared_ptr<DMCANDevice> dm_device, const CANPacket& packet) {
     {
-        can_frame frame = dm_device->create_can_frame(packet.send_can_id, packet.data);
+        can_frame_ex frame = dm_device->create_can_frame(packet.send_can_id, packet.data);
         can_socket_.write_can_frame(frame);
     }
 }

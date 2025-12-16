@@ -6,7 +6,7 @@
 
 namespace openarm::can::socket {
 
-OpenArm::OpenArm(const std::string& can_interface, bool enable_fd)
+OpenArm::OpenArm(const std::string& can_interface)
     : can_interface_(can_interface){
     can_socket_ = std::make_unique<canbus::CANSocket_Ex>(can_interface_);
     master_can_device_collection_ = std::make_unique<canbus::CANDeviceCollection>(*can_socket_);
@@ -70,18 +70,18 @@ void OpenArm::disable_all() {
         device_collection->disable_all();
     }
 }
-
+//TODO::Need to know whether all node response are received, introduce transactionId for each writing operation.
 void OpenArm::recv_all(int timeout_us) {
     // The timeout for select() is set to timeout_us (default: 500 us).
     // Tuning this value may improve the performance but should be done with caution.
 
     // CAN 2.0
     {
-        can_frame response_frame;
-        while (can_socket_->is_data_available(timeout_us) &&
-               can_socket_->read_can_frame(response_frame)) {
-            master_can_device_collection_->dispatch_frame_callback(response_frame);
-        }
+//        can_frame_ex response_frame;
+//        while (can_socket_->is_data_available(timeout_us) &&
+//               can_socket_->read_can_frame(response_frame)) {
+//            master_can_device_collection_->dispatch_frame_callback(response_frame);
+//        }
     }
     // }
 }

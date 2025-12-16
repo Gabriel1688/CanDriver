@@ -54,10 +54,10 @@ public:
     ssize_t write_raw_frame(const void* buffer, size_t frame_size);
 
     // write can_frame or canfd_frame
-    bool write_can_frame(const can_frame& frame);
+    bool write_can_frame(const can_frame_ex& frame);
 
     // read can_frame or canfd_frame
-    bool read_can_frame(can_frame& frame);
+    bool read_can_frame(can_frame_ex& frame);
 
     // check if data is available for reading (non-blocking)
     bool is_data_available(int timeout_us = 100);

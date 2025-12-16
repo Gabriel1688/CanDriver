@@ -104,12 +104,11 @@ void CANSocket_Ex::run() {
             {
                 if (events[i].data.fd == socket_fd_)
                 {
-                    char msg[MAX_PACKET_SIZE];
-                    memset(msg,0,MAX_PACKET_SIZE);
-                    const size_t numOfBytesReceived = recv(socket_fd_, msg, MAX_PACKET_SIZE, 0);
-                    if (numOfBytesReceived < 1) {
+                    can_frame_ex frame;
+                    ssize_t bytes_read = read(socket_fd_, &frame, sizeof(frame));
+                    if (bytes_read < 1) {
                         std::string errorMsg;
-                        if (numOfBytesReceived == 0) {
+                        if (bytes_read == 0) {
                             errorMsg = "Server closed connection";
                         } else {
                             errorMsg = strerror(errno);
@@ -118,7 +117,7 @@ void CANSocket_Ex::run() {
                         //publishServerDisconnected(errorMsg);
                         return;
                     } else {
-                        handlereceivedMsg(msg,numOfBytesReceived);
+                        //handlereceivedMsg(msg,bytes_read);
                     }
                 }
             }
@@ -155,11 +154,11 @@ ssize_t CANSocket_Ex::write_raw_frame(const void* buffer, size_t frame_size) {
     return write(socket_fd_, buffer, frame_size);
 }
 
-bool CANSocket_Ex::write_can_frame(const can_frame& frame) {
+bool CANSocket_Ex::write_can_frame(const can_frame_ex& frame) {
     return write(socket_fd_, &frame, sizeof(frame)) == sizeof(frame);
 }
 
-bool CANSocket_Ex::read_can_frame(can_frame& frame) {
+bool CANSocket_Ex::read_can_frame(can_frame_ex& frame) {
     ssize_t bytes_read = read(socket_fd_, &frame, sizeof(frame));
     return bytes_read == sizeof(frame);
 }

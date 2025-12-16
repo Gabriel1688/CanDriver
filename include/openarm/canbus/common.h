@@ -15,4 +15,12 @@ struct can_frame {
     __u8    __res1;  /* reserved / padding */
     __u8    data[CAN_MAX_DLEN] __attribute__((aligned(8)));
 };
+#pragma pack(push, 1)
+struct can_frame_ex {
+    uint8_t  FrameHeader = 0x08;          // 0：标准帧 0： 数据帧, DLC = 8;
+    uint32_t FrameId = 0x01;              // CAN ID 使用电机ID作为CAN ID
+    uint8_t data[CAN_MAX_DLEN] __attribute__((aligned(8)));
+};
+#pragma pack(pop)
+
 #endif  // OPENARM_CAN_COMMON_H

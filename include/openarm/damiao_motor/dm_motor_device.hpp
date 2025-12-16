@@ -20,7 +20,7 @@ public:
     void callback(const can_frame& frame);
 
     // Create frame from data array
-    can_frame create_can_frame(canid_t send_can_id, std::vector<uint8_t> data);
+    can_frame_ex create_can_frame(canid_t send_can_id, std::vector<uint8_t> data);
     // Getter method to access motor state
     Motor& get_motor() { return motor_; }
     void set_callback_mode(CallbackMode callback_mode) { callback_mode_ = callback_mode; }

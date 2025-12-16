@@ -41,12 +41,11 @@ void DMCANDevice::callback(const can_frame& frame) {
             break;
     }
 }
-
-can_frame DMCANDevice::create_can_frame(canid_t send_can_id, std::vector<uint8_t> data) {
-    can_frame frame;
+can_frame_ex DMCANDevice::create_can_frame(canid_t send_can_id, std::vector<uint8_t> data) {
+    can_frame_ex frame;
     std::memset(&frame, 0, sizeof(frame));
-    frame.can_id = send_can_id;
-    frame.can_dlc = data.size();
+    frame.FrameHeader = data.size();
+    frame.FrameId = __builtin_bswap32(send_can_id);
     std::copy(data.begin(), data.end(), frame.data);
     return frame;
 }

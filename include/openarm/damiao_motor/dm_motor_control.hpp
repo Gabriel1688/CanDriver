@@ -52,16 +52,13 @@ public:
     static CANPacket create_disable_command(const Motor& motor);
     static CANPacket create_set_zero_command(const Motor& motor);
     static CANPacket create_mit_control_command(const Motor& motor, const MITParam& mit_param);
-    static CANPacket create_posvel_control_command(const Motor& motor,
-                                                   const PosVelParam& posvel_param);
+    static CANPacket create_posvel_control_command(const Motor& motor, const PosVelParam& posvel_param);
     static CANPacket create_query_param_command(const Motor& motor, int RID);
     static CANPacket create_refresh_command(const Motor& motor);
 
 private:
-    static std::vector<uint8_t> pack_mit_control_data(MotorType motor_type,
-                                                      const MITParam& mit_param);
-    static std::vector<uint8_t> pack_posvel_control_data(MotorType motor_type,
-                                                         const PosVelParam& posvel_param);
+    static std::vector<uint8_t> pack_mit_control_data(MotorType motor_type, const MITParam& mit_param);
+    static std::vector<uint8_t> pack_posvel_control_data(MotorType motor_type, const PosVelParam& posvel_param);
 
     static std::vector<uint8_t> pack_query_param_data(uint32_t send_can_id, int RID);
     static std::vector<uint8_t> pack_command_data(uint8_t cmd);
