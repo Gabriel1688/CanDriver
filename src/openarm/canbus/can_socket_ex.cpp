@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <sys/epoll.h>
+#include "spdlog/spdlog.h"
 
 namespace openarm::canbus {
 
@@ -132,18 +133,17 @@ void CANSocket_Ex::subscribe(const int32_t deviceId, const client_observer_t & o
 }
 
 void CANSocket_Ex::handlereceivedMsg(const can_frame_ex& msg, size_t msgSize) {
-    std::cout << "Received server data, size : " << msgSize << std::endl;
     can_frame frame;
     frame.can_id = __builtin_bswap32(msg.FrameId);
     frame.can_dlc = msgSize -5;  //substract header and frameId, get only the payload
     memcpy(frame.data,msg.data,frame.can_dlc);
-    std::cout << " can_id: [" << frame.can_id << "]"<< std::endl;
 
     // call the subscribers for the notification.
     auto it = _subscribers.find(frame.can_id);
     if(it != _subscribers.end()) {
         it->second.incomingPacketHandler(frame);
     }
+    spdlog::info("------> {0:04x} : {1:02x}", frame.can_id, fmt::join(frame.data, " "));
 }
 
 void CANSocket_Ex::cleanup() {
@@ -161,7 +161,10 @@ ssize_t CANSocket_Ex::write_raw_frame(const void* buffer, size_t frame_size) {
     return write(socket_fd_, buffer, frame_size);
 }
 
-bool CANSocket_Ex::write_can_frame(const can_frame_ex& frame) {
+bool CANSocket_Ex::write_can_frame(can_frame_ex& frame) {
+
+    spdlog::info("<------ {0:04x} : {1:02x}", frame.FrameId, fmt::join(frame.data, " "));
+    frame.FrameId = __builtin_bswap32(frame.FrameId);
     return write(socket_fd_, &frame, sizeof(frame)) == sizeof(frame);
 }
 

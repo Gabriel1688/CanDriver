@@ -20,8 +20,19 @@
 #include <openarm/damiao_motor/dm_motor_constants.hpp>
 #include <thread>
 
+#include "spdlog/spdlog.h"
+#include "spdlog/fmt/ostr.h"
+
 int main() {
     try {
+        spdlog::info("spdlog version  {}.{}.{}  !", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR,SPDLOG_VER_PATCH);
+
+        unsigned char data[] = {0xDE, 0xAD, 0xBE, 0xEF, 0x12, 0x34, 0x56, 0x78};
+
+        // Use fmt::join to format the array elements separated by spaces
+        // and apply the hexadecimal format specifier to the joined range
+        spdlog::info("Raw data in hex: {0:#x}", fmt::join(data, " "));
+
         std::cout << "=== OpenArm CAN Example ===" << std::endl;
         std::cout << "This example demonstrates the OpenArm API functionality" << std::endl;
 

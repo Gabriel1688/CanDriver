@@ -52,7 +52,7 @@ can_frame_ex DMCANDevice::create_can_frame(canid_t send_can_id, std::vector<uint
     can_frame_ex frame;
     std::memset(&frame, 0, sizeof(frame));
     frame.FrameHeader = data.size();
-    frame.FrameId = __builtin_bswap32(send_can_id);
+    frame.FrameId = send_can_id;
     std::copy(data.begin(), data.end(), frame.data);
     return frame;
 }
