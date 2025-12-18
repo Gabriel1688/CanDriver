@@ -32,13 +32,13 @@ void DMCANDevice::callback(const can_frame& frame) {
             }
             break;
         case PARAM: {
-            ParamResult result = CanPacketDecoder::parse_motor_param_data(data);
-            if (result.valid) {
-                motor_.set_temp_param(result.rid, result.value);
-            }
-            else {
-                std::cout <<"Callback mode [PARAM] : invalid message: " << frame.can_id << std::endl;
-            }
+                ParamResult result = CanPacketDecoder::parse_motor_param_data(data);
+                if (result.valid) {
+                    motor_.set_temp_param(result.rid, result.value);
+                } else {
+                    std::cout << "Callback mode [PARAM] : invalid message: " << frame.can_id
+                              << std::endl;
+                }
             break;
         }
         case IGNORE:

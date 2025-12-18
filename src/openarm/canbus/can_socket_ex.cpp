@@ -138,12 +138,18 @@ void CANSocket_Ex::handlereceivedMsg(const can_frame_ex& msg, size_t msgSize) {
     frame.can_dlc = msgSize -5;  //substract header and frameId, get only the payload
     memcpy(frame.data,msg.data,frame.can_dlc);
 
-    // call the subscribers for the notification.
-    auto it = _subscribers.find(frame.can_id);
-    if(it != _subscribers.end()) {
-        it->second.incomingPacketHandler(frame);
-    }
     spdlog::info("------> {0:04x} : {1:02x}", frame.can_id, fmt::join(frame.data, " "));
+
+    // call the subscribers for the notification.
+    // TODO: currently, take frameId as can_id. it is a limitation to be resolved.
+    //       only handle response with frameId = 0x7ff(response for para/refresh command)
+    if( frame.can_id == 0x7ff) {
+        frame.can_id = frame.data[0];  // data[0] is the low byte of CAN ID.
+        auto it = _subscribers.find(frame.can_id);
+        if(it != _subscribers.end()) {
+            it->second.incomingPacketHandler(frame);
+        }
+    }
 }
 
 void CANSocket_Ex::cleanup() {

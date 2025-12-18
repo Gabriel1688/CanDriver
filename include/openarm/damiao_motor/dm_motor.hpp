@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <cstring>
 #include <map>
+#include <mutex>
+#include <condition_variable>
 
 #include "dm_motor_constants.hpp"
 
@@ -31,6 +33,7 @@ public:
 
     // Enable status getters
     bool is_enabled() const { return enabled_; }
+    bool wait_response();
 
     // Parameter methods
     double get_param(int RID) const;
@@ -45,6 +48,7 @@ protected:
     void set_state_trotor(int trotor);
     void set_enabled(bool enabled);
     void set_temp_param(int RID, int val);
+    void notify();
 
     // Motor identifiers
     uint32_t send_can_id_;
@@ -60,5 +64,10 @@ protected:
 
     // Parameter storage
     std::map<int, double> temp_param_dict_;
+    //TODO fix the compilation error:  deleted function.
+    //     mutex/conditional variable should not be share pointer.
+    std::shared_ptr<std::mutex> request_mutex_;
+    std::shared_ptr<std::condition_variable> request_cv_;
+    bool completed_;
 };
 }  // namespace openarm::damiao_motor
