@@ -14,25 +14,34 @@
 
 #pragma once
 
-#include <linux/can.h>
-#include <linux/can/raw.h>
 
 #include <stdexcept>
 #include <string>
+#include "common.h"
+#include <functional>
+#include <map>
+#include <pthread.h>
+#include <atomic>
+#include <mutex>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <memory>
+#include <condition_variable>
+
 
 namespace openarm::canbus {
 
-// Exception classes for socket operations
-class CANSocketException : public std::runtime_error {
-public:
-    explicit CANSocketException(const std::string& message)
-        : std::runtime_error("Socket error: " + message) {}
+struct client_observer_t {
+    int id = 0;
+    std::function<void(const can_frame& frame)> incomingPacketHandler = nullptr;
+    std::function<void(const std::string & ret)> disconnectionHandler = nullptr;
+    bool completed=false;
 };
-
 // Base socket management class
 class CANSocket {
 public:
-    explicit CANSocket(const std::string& interface, bool enable_fd = false);
+    explicit CANSocket(const std::string& interface);
     ~CANSocket();
 
     // Disable copy, enable move
@@ -44,7 +53,6 @@ public:
     // File descriptor access for Python bindings
     int get_socket_fd() const { return socket_fd_; }
     const std::string& get_interface() const { return interface_; }
-    bool is_canfd_enabled() const { return fd_enabled_; }
     bool is_initialized() const { return socket_fd_ >= 0; }
 
     // Direct frame operations for Python bindings
@@ -52,23 +60,35 @@ public:
     ssize_t write_raw_frame(const void* buffer, size_t frame_size);
 
     // write can_frame or canfd_frame
-    bool write_can_frame(const can_frame& frame);
-    bool write_canfd_frame(const canfd_frame& frame);
+    bool write_can_frame(can_frame_ex& frame);
 
     // read can_frame or canfd_frame
-    bool read_can_frame(can_frame& frame);
-    bool read_canfd_frame(canfd_frame& frame);
+    bool read_can_frame(can_frame_ex& frame);
 
     // check if data is available for reading (non-blocking)
     bool is_data_available(int timeout_us = 100);
-
+    void subscribe(const int32_t deviceId, const client_observer_t & observer);
 protected:
     bool initialize_socket(const std::string& interface);
     void cleanup();
+    void run();
+    static void* EntryOfThread(void* argv);
 
+    /*
+     * Publish incomingPacketHandler client message to observer.
+     * Observers get only messages that originated
+     * from clients with IP address identical to
+     * the specific observer requested IP
+     */
+    void handlereceivedMsg(const can_frame_ex& frame, size_t msgSize);
+    std::string address;
+    int port;
     int socket_fd_;
     std::string interface_;
-    bool fd_enabled_;
+    pthread_t thread_id;
+    bool isConnected_;
+    std::mutex _subscribersMtx;
+    std::map<int32_t, client_observer_t> _subscribers;
 };
 
 }  // namespace openarm::canbus

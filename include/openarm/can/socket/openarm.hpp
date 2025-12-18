@@ -18,10 +18,9 @@
 #include <string>
 
 #include "../../canbus/can_device_collection.hpp"
-//#include "../../canbus/can_socket.hpp"
+#include "../../canbus/can_socket.hpp"
 #include "arm_component.hpp"
 #include "gripper_component.hpp"
-#include "../../canbus/can_socket_ex.hpp"
 
 namespace openarm::can::socket {
 class OpenArm {
@@ -61,8 +60,7 @@ public:
 
 private:
     std::string can_interface_;
-    std::unique_ptr<canbus::CANSocket_Ex> can_socket_;
-    //std::unique_ptr<canbus::CANSocket> can_socket_;
+    std::unique_ptr<canbus::CANSocket> can_socket_;
     std::unique_ptr<ArmComponent> arm_;
     std::unique_ptr<GripperComponent> gripper_;
     std::unique_ptr<canbus::CANDeviceCollection> master_can_device_collection_;

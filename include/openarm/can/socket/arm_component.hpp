@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "../../canbus/can_socket_ex.hpp"
+#include "../../canbus/can_socket.hpp"
 #include "../../damiao_motor/dm_motor.hpp"
 #include "../../damiao_motor/dm_motor_device_collection.hpp"
 
@@ -10,7 +10,7 @@ namespace openarm::can::socket {
 
 class ArmComponent : public damiao_motor::DMDeviceCollection {
 public:
-    ArmComponent(canbus::CANSocket_Ex& can_socket);
+    ArmComponent(canbus::CANSocket& can_socket);
     ~ArmComponent() = default;
 
     void init_motor_devices(const std::vector<damiao_motor::MotorType>& motor_types,

@@ -26,7 +26,7 @@ namespace openarm::damiao_motor {
 
 class DMDeviceCollection {
 public:
-    DMDeviceCollection(canbus::CANSocket_Ex& can_socket);
+    DMDeviceCollection(canbus::CANSocket& can_socket);
     virtual ~DMDeviceCollection() = default;
 
     // Common motor operations
@@ -60,7 +60,7 @@ public:
     canbus::CANDeviceCollection& get_device_collection() { return *device_collection_; }
 
 protected:
-    canbus::CANSocket_Ex& can_socket_;
+    canbus::CANSocket& can_socket_;
     std::unique_ptr<CanPacketEncoder> can_packet_encoder_;
     std::unique_ptr<CanPacketDecoder> can_packet_decoder_;
     std::unique_ptr<canbus::CANDeviceCollection> device_collection_;

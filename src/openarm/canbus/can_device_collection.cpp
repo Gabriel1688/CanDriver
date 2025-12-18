@@ -1,30 +1,30 @@
 
 #include <iostream>
 #include <openarm/canbus/can_device_collection.hpp>
-#include <openarm/canbus/can_socket_ex.hpp>
+#include <openarm/canbus/can_socket.hpp>
 
 namespace openarm::canbus {
 
-CANDeviceCollection::CANDeviceCollection(CANSocket_Ex& can_socket) : can_socket_(can_socket) {
+CANDeviceCollection::CANDeviceCollection(CANSocket& can_socket) : can_socket_(can_socket) {
     // configure and register to can socket
     client_observer_t observer;
     observer.id = 0x11;
     observer.incomingPacketHandler = std::bind(&CANDeviceCollection::dispatch_frame_callback, this, std::placeholders::_1);
     observer.disconnectionHandler  = nullptr;
-    can_socket.subscribe(observer.id, observer);
+    can_socket_.subscribe(observer.id, observer);
 
     client_observer_t observer1;
     observer1.id = 0x12;
     observer1.incomingPacketHandler = std::bind(&CANDeviceCollection::dispatch_frame_callback, this, std::placeholders::_1);
     observer1.disconnectionHandler  = nullptr;
-    can_socket.subscribe(observer1.id, observer1);
+    can_socket_.subscribe(observer1.id, observer1);
 
     client_observer_t observer2;
     observer2.id = 0x18;
     observer2.incomingPacketHandler = std::bind(&CANDeviceCollection::dispatch_frame_callback, this, std::placeholders::_1);
     observer2.disconnectionHandler  = nullptr;
 
-    can_socket.subscribe(observer2.id, observer2);
+    can_socket_.subscribe(observer2.id, observer2);
 }
 
 CANDeviceCollection::~CANDeviceCollection() {}

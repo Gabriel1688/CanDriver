@@ -4,7 +4,7 @@
 
 namespace openarm::damiao_motor {
 
-DMDeviceCollection::DMDeviceCollection(canbus::CANSocket_Ex& can_socket)
+DMDeviceCollection::DMDeviceCollection(canbus::CANSocket& can_socket)
     : can_socket_(can_socket),
       can_packet_encoder_(std::make_unique<CanPacketEncoder>()),
       can_packet_decoder_(std::make_unique<CanPacketDecoder>()),

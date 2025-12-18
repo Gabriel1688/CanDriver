@@ -21,7 +21,7 @@
 
 namespace openarm::can::socket {
 
-GripperComponent::GripperComponent(canbus::CANSocket_Ex& can_socket)
+GripperComponent::GripperComponent(canbus::CANSocket& can_socket)
     : DMDeviceCollection(can_socket) {}
 
 void GripperComponent::init_motor_device(damiao_motor::MotorType motor_type, uint32_t send_can_id,

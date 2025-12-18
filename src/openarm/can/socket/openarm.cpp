@@ -8,7 +8,7 @@ namespace openarm::can::socket {
 
 OpenArm::OpenArm(const std::string& can_interface)
     : can_interface_(can_interface){
-    can_socket_ = std::make_unique<canbus::CANSocket_Ex>(can_interface_);
+    can_socket_ = std::make_unique<canbus::CANSocket>(can_interface_);
     master_can_device_collection_ = std::make_unique<canbus::CANDeviceCollection>(*can_socket_);
     arm_ = std::make_unique<ArmComponent>(*can_socket_);
     gripper_ = std::make_unique<GripperComponent>(*can_socket_);

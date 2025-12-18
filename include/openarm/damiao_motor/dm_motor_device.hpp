@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../canbus/common.h"
 #include "../canbus/can_device.hpp"
-#include "../canbus/can_socket_ex.hpp"
+#include "../canbus/can_socket.hpp"
+#include "../canbus/common.h"
 #include "dm_motor.hpp"
 #include "dm_motor_control.hpp"
 

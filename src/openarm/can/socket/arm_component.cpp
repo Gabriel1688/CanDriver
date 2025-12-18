@@ -2,7 +2,7 @@
 
 namespace openarm::can::socket {
 
-ArmComponent::ArmComponent(canbus::CANSocket_Ex& can_socket)
+ArmComponent::ArmComponent(canbus::CANSocket& can_socket)
     : damiao_motor::DMDeviceCollection(can_socket) {}
 
 void ArmComponent::init_motor_devices(const std::vector<damiao_motor::MotorType>& motor_types,
