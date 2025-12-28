@@ -1,5 +1,3 @@
-
-#include <iostream>
 #include <openarm/canbus/can_device_collection.hpp>
 #include <openarm/canbus/can_socket.hpp>
 
