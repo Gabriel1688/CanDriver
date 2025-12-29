@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <string>
 #include "spdlog/spdlog.h"
+#include <unistd.h>
 namespace openarm::damiao_motor {
 
 // Constructor
@@ -16,9 +17,9 @@ Motor::Motor(MotorType motor_type, uint32_t send_can_id, uint32_t recv_can_id)
       state_tau_(0.0),
       state_tmos_(0),
       state_trotor_(0) {
-    completed_ = true;
     request_mutex_ = std::make_shared<std::mutex>();
     request_cv_ = std::make_shared<std::condition_variable>() ;
+    completed_ = std::make_shared<std::atomic<bool>>(true);
 }
 
 // Enable methods
@@ -47,17 +48,19 @@ void Motor::update_state(double q, double dq, double tau, int tmos, int trotor) 
 }
 bool Motor::wait_response() {
     std::unique_lock<std::mutex> lock(*request_mutex_);
-    completed_ = false;
-    bool result = request_cv_->wait_for(lock, std::chrono::milliseconds{200}, [&] { return completed_; });
+    completed_->store(false);
+    bool result = request_cv_->wait_for(lock, std::chrono::milliseconds{200}, [&] { return completed_->load(); });
     if(result == false) {
         spdlog::error("Motor::wait_response failed to get response within 200ms.");
     }
     return  result;
 }
 void Motor::notify() {
-    std::unique_lock<std::mutex> lock(*request_mutex_);
-    if(completed_ == false) {
-        completed_ = true;
+    while (completed_->load() ) {
+        usleep(100);
+    }
+    if(completed_->load() == false) {
+        completed_->store(true);
         request_cv_->notify_one();
     }
 }

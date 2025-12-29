@@ -75,13 +75,13 @@ void CANSocket::run() {
     struct epoll_event ev;
     int epfd = epoll_create(2);
     ev.data.fd = socket_fd_;
-    ev.events = EPOLLIN | EPOLLET;
+    ev.events = EPOLLIN;
     epoll_ctl(epfd, EPOLL_CTL_ADD, socket_fd_ , &ev);
 
     struct epoll_event events[2];
     while (isConnected_)
     {
-        int ready = epoll_wait(epfd, events, 2, 20);  //20 milliseconds
+        int ready = epoll_wait(epfd, events, 2, -1);  //20 milliseconds
         if (ready < 0)
         {
             perror("epoll_wait error.");
@@ -89,7 +89,6 @@ void CANSocket::run() {
         }
         else if (ready == 0) {
             /* timeout, no data coming */
-            std::cout << "epoll_wait timeout" << std::endl;
             continue;
         }
         else {
@@ -126,7 +125,7 @@ void CANSocket::subscribe(const int32_t deviceId, const client_observer_t & obse
 void CANSocket::handlereceivedMsg(const can_frame_ex& msg, size_t msgSize) {
     can_frame frame;
     frame.can_id = __builtin_bswap32(msg.FrameId);
-    frame.can_dlc = msgSize -5;  //substract header and frameId, get only the payload
+    frame.can_dlc = msgSize - 5;  //substract header and frameId, get only the payload
     memcpy(frame.data,msg.data,frame.can_dlc);
 
     spdlog::info("------> {0:04x} : {1:02x}", frame.can_id, fmt::join(frame.data, " "));

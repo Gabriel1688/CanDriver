@@ -18,7 +18,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-
 namespace openarm::canbus {
 
 struct client_observer_t {

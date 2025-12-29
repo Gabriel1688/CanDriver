@@ -6,6 +6,7 @@
 #include <map>
 #include <mutex>
 #include <condition_variable>
+#include <atomic>
 
 #include "dm_motor_constants.hpp"
 
@@ -68,6 +69,6 @@ protected:
     //     mutex/conditional variable should not be share pointer.
     std::shared_ptr<std::mutex> request_mutex_;
     std::shared_ptr<std::condition_variable> request_cv_;
-    bool completed_;
+    std::shared_ptr<std::atomic<bool>> completed_;
 };
 }  // namespace openarm::damiao_motor
