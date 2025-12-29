@@ -78,5 +78,4 @@ LimitParam Motor::get_limit_param(MotorType motor_type) {
     }
     return MOTOR_LIMIT_PARAMS[index];
 }
-
 }  // namespace openarm::damiao_motor

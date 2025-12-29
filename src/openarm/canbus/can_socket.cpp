@@ -14,9 +14,6 @@
 #include "spdlog/spdlog.h"
 
 namespace openarm::canbus {
-
-#define MAX_PACKET_SIZE 1500
-
 CANSocket::CANSocket(const std::string& interface)
     : socket_fd_(-1), interface_(interface) {
     address="127.0.0.1";
@@ -148,15 +145,6 @@ void CANSocket::cleanup() {
         socket_fd_ = -1;
     }
 }
-
-ssize_t CANSocket::read_raw_frame(void* buffer, size_t buffer_size) {
-    return read(socket_fd_, buffer, buffer_size);
-}
-
-ssize_t CANSocket::write_raw_frame(const void* buffer, size_t frame_size) {
-    return write(socket_fd_, buffer, frame_size);
-}
-
 bool CANSocket::write_can_frame(can_frame_ex& frame) {
     spdlog::info("<------ {0:04x} : {1:02x}", frame.FrameId, fmt::join(frame.data, " "));
     frame.FrameId = __builtin_bswap32(frame.FrameId);
@@ -167,20 +155,4 @@ bool CANSocket::read_can_frame(can_frame_ex& frame) {
     ssize_t bytes_read = read(socket_fd_, &frame, sizeof(frame));
     return bytes_read == sizeof(frame);
 }
-
-bool CANSocket::is_data_available(int timeout_us) {
-    fd_set read_fds;
-    struct timeval timeout;
-
-    FD_ZERO(&read_fds);
-    FD_SET(socket_fd_, &read_fds);
-
-    timeout.tv_sec = timeout_us / 1000000;
-    timeout.tv_usec = (timeout_us % 1000000);
-
-    int result = select(socket_fd_ + 1, &read_fds, nullptr, nullptr, &timeout);
-
-    return (result > 0 && FD_ISSET(socket_fd_, &read_fds));
-}
-
 }  // namespace openarm::canbus

@@ -4,15 +4,12 @@
 #include <iostream>
 #include <map>
 #include <vector>
-
-#include "../canbus/common.h"
 #include "dm_motor.hpp"
 #include "dm_motor_constants.hpp"
 
 namespace openarm::damiao_motor {
 // Forward declarations
 class Motor;
-
 struct ParamResult {
     int rid;
     double value;
@@ -55,14 +52,11 @@ public:
     static CANPacket create_posvel_control_command(const Motor& motor, const PosVelParam& posvel_param);
     static CANPacket create_query_param_command(const Motor& motor, int RID);
     static CANPacket create_refresh_command(const Motor& motor);
-
 private:
     static std::vector<uint8_t> pack_mit_control_data(MotorType motor_type, const MITParam& mit_param);
     static std::vector<uint8_t> pack_posvel_control_data(MotorType motor_type, const PosVelParam& posvel_param);
-
     static std::vector<uint8_t> pack_query_param_data(uint32_t send_can_id, int RID);
     static std::vector<uint8_t> pack_command_data(uint8_t cmd);
-
     static double limit_min_max(double x, double min, double max);
     static uint16_t double_to_uint(double x, double x_min, double x_max, int bits);
     static std::array<uint8_t, 4> float_to_uint8s(float value);
@@ -72,12 +66,10 @@ class CanPacketDecoder {
 public:
     static StateResult parse_motor_state_data(const Motor& motor, const std::vector<uint8_t>& data);
     static ParamResult parse_motor_param_data(const std::vector<uint8_t>& data);
-
 private:
     static double uint_to_double(uint16_t x, double min, double max, int bits);
     static float uint8s_to_float(const std::array<uint8_t, 4>& bytes);
     static uint32_t uint8s_to_uint32(uint8_t byte1, uint8_t byte2, uint8_t byte3, uint8_t byte4);
     static bool is_in_ranges(int number);
 };
-
 }  // namespace openarm::damiao_motor

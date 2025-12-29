@@ -1,12 +1,9 @@
 #pragma once
-
-#include <stdexcept>
 #include <string>
 #include "common.h"
 #include <functional>
 #include <map>
 #include <pthread.h>
-#include <atomic>
 #include <mutex>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -14,9 +11,6 @@
 #include <memory>
 #include <condition_variable>
 #include <sys/socket.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 namespace openarm::canbus {
 
@@ -43,18 +37,11 @@ public:
     const std::string& get_interface() const { return interface_; }
     bool is_initialized() const { return socket_fd_ >= 0; }
 
-    // Direct frame operations for Python bindings
-    ssize_t read_raw_frame(void* buffer, size_t buffer_size);
-    ssize_t write_raw_frame(const void* buffer, size_t frame_size);
-
     // write can_frame or canfd_frame
     bool write_can_frame(can_frame_ex& frame);
 
     // read can_frame or canfd_frame
     bool read_can_frame(can_frame_ex& frame);
-
-    // check if data is available for reading (non-blocking)
-    bool is_data_available(int timeout_us = 100);
     void subscribe(const int32_t deviceId, const client_observer_t & observer);
 protected:
     bool initialize_socket(const std::string& interface);

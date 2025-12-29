@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <cstdint>
@@ -12,8 +11,7 @@
 
 namespace openarm::damiao_motor {
 class Motor {
-    friend class DMCANDevice;  // Allow MotorDeviceCan to access protected
-                               // members
+    friend class DMCANDevice;  // Allow MotorDeviceCan to access protected members
     friend class DMControl;
 
 public:

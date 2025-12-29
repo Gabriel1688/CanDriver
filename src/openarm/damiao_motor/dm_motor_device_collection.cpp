@@ -1,9 +1,9 @@
 #include <iostream>
 #include <openarm/canbus/common.h>
+#include <openarm/canbus/can_socket.hpp>
 #include <openarm/damiao_motor/dm_motor_device_collection.hpp>
 
 namespace openarm::damiao_motor {
-
 DMDeviceCollection::DMDeviceCollection(canbus::CANSocket& can_socket)
     : can_socket_(can_socket),
       can_packet_encoder_(std::make_unique<CanPacketEncoder>()),
@@ -129,5 +129,4 @@ std::vector<std::shared_ptr<DMCANDevice>> DMDeviceCollection::get_dm_devices() c
     }
     return dm_devices;
 }
-
 }  // namespace openarm::damiao_motor

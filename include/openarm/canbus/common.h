@@ -22,5 +22,4 @@ struct can_frame_ex {
     uint8_t data[CAN_MAX_DLEN] __attribute__((aligned(8)));
 };
 #pragma pack(pop)
-
 #endif  // OPENARM_CAN_COMMON_H
