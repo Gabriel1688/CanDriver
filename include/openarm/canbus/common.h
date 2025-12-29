@@ -1,6 +1,6 @@
 #ifndef OPENARM_CAN_COMMON_H
 #define OPENARM_CAN_COMMON_H
-
+#include <cstdint>
 #define CAN_MAX_DLC 8
 #define CAN_MAX_DLEN 8
 typedef unsigned char __u8;

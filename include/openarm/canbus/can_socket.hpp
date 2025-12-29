@@ -13,6 +13,10 @@
 #include <arpa/inet.h>
 #include <memory>
 #include <condition_variable>
+#include <sys/socket.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 
 namespace openarm::canbus {
@@ -66,6 +70,7 @@ protected:
      * the specific observer requested IP
      */
     void handlereceivedMsg(const can_frame_ex& frame, size_t msgSize);
+    struct sockaddr_in _server;
     std::string address;
     int port;
     int socket_fd_;
