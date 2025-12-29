@@ -45,6 +45,7 @@ void Motor::update_state(double q, double dq, double tau, int tmos, int trotor) 
     state_tau_ = tau;
     state_tmos_ = tmos;
     state_trotor_ = trotor;
+    notify();
 }
 bool Motor::wait_response() {
     std::unique_lock<std::mutex> lock(*request_mutex_);
@@ -57,7 +58,7 @@ bool Motor::wait_response() {
 }
 void Motor::notify() {
     while (completed_->load() ) {
-        usleep(100);
+        usleep(20);
     }
     if(completed_->load() == false) {
         completed_->store(true);

@@ -43,6 +43,7 @@ void DMDeviceCollection::refresh_one(int i) {
     auto& motor = dm_device->get_motor();
     CANPacket refresh_packet = CanPacketEncoder::create_refresh_command(motor);
     send_command_to_device(dm_device, refresh_packet);
+    motor.wait_response();
 }
 
 void DMDeviceCollection::refresh_all() {
@@ -50,6 +51,7 @@ void DMDeviceCollection::refresh_all() {
         auto& motor = dm_device->get_motor();
         CANPacket refresh_packet = CanPacketEncoder::create_refresh_command(motor);
         send_command_to_device(dm_device, refresh_packet);
+        motor.wait_response();
     }
 }
 
@@ -60,9 +62,11 @@ void DMDeviceCollection::set_callback_mode_all(CallbackMode callback_mode) {
 }
 
 void DMDeviceCollection::query_param_one(int i, int RID) {
-    CANPacket param_query =
-        CanPacketEncoder::create_query_param_command(get_dm_devices()[i]->get_motor(), RID);
+    auto dm_device = get_dm_devices().at(i);
+    auto& motor = dm_device->get_motor();
+    CANPacket param_query = CanPacketEncoder::create_query_param_command(motor, RID);
     send_command_to_device(get_dm_devices()[i], param_query);
+    motor.wait_response();
 }
 
 void DMDeviceCollection::query_param_all(int RID) {
