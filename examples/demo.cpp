@@ -70,6 +70,7 @@ int main() {
                       << motor.get_param(static_cast<int>(openarm::damiao_motor::RID::MST_ID))
                       << std::endl;
         }
+
         for (const auto& motor : openarm.get_gripper().get_motors()) {
             std::cout << "Gripper Motor: " << motor.get_send_can_id() << " ID: "
                       << motor.get_param(static_cast<int>(openarm::damiao_motor::RID::MST_ID))

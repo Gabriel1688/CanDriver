@@ -160,24 +160,11 @@ void CANSocket::cleanup() {
     }
 }
 
-ssize_t CANSocket::read_raw_frame(void* buffer, size_t buffer_size) {
-    return read(socket_fd_, buffer, buffer_size);
-}
-
-ssize_t CANSocket::write_raw_frame(const void* buffer, size_t frame_size) {
-    return write(socket_fd_, buffer, frame_size);
-}
-
 bool CANSocket::write_can_frame(can_frame_ex& frame) {
 
     spdlog::info("<------ {0:04x} : {1:02x}", frame.FrameId, fmt::join(frame.data, " "));
     frame.FrameId = __builtin_bswap32(frame.FrameId);
     return write(socket_fd_, &frame, sizeof(frame)) == sizeof(frame);
-}
-
-bool CANSocket::read_can_frame(can_frame_ex& frame) {
-    ssize_t bytes_read = read(socket_fd_, &frame, sizeof(frame));
-    return bytes_read == sizeof(frame);
 }
 
 bool CANSocket::is_data_available(int timeout_us) {

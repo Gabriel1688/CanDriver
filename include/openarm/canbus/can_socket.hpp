@@ -40,10 +40,6 @@ public:
     const std::string& get_interface() const { return interface_; }
     bool is_initialized() const { return socket_fd_ >= 0; }
 
-    // Direct frame operations for Python bindings
-    ssize_t read_raw_frame(void* buffer, size_t buffer_size);
-    ssize_t write_raw_frame(const void* buffer, size_t frame_size);
-
     // write can_frame or canfd_frame
     bool write_can_frame(can_frame_ex& frame);
 
