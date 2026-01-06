@@ -11,18 +11,26 @@ DMDeviceCollection::DMDeviceCollection(canbus::CANSocket& can_socket)
       device_collection_(std::make_unique<canbus::CANDeviceCollection>(can_socket_)) {}
 
 void DMDeviceCollection::enable_all() {
-    for (auto dm_device : get_dm_devices()) {
-        auto& motor = dm_device->get_motor();
-        CANPacket enable_packet = CanPacketEncoder::create_enable_command(motor);
-        send_command_to_device(dm_device, enable_packet);
+    for(int i = 0; i < get_dm_devices().size(); i ++) {
+        enable(i);
     }
+}
+void DMDeviceCollection::enable(int i) {
+    auto dm_device = get_dm_devices().at(i);
+    auto& motor = dm_device->get_motor();
+    CANPacket enable_packet = CanPacketEncoder::create_enable_command(motor);
+    send_command_to_device(dm_device, enable_packet);
 }
 
 void DMDeviceCollection::disable_all() {
-    for (auto dm_device : get_dm_devices()) {
-        CANPacket disable_packet = CanPacketEncoder::create_disable_command(dm_device->get_motor());
-        send_command_to_device(dm_device, disable_packet);
+    for(int i = 0; i < get_dm_devices().size(); i ++) {
+        disable(i);
     }
+}
+void DMDeviceCollection::disable(int i) {
+    auto dm_device = get_dm_devices().at(i);
+    CANPacket disable_packet = CanPacketEncoder::create_disable_command(dm_device->get_motor());
+    send_command_to_device(dm_device, disable_packet);
 }
 
 void DMDeviceCollection::set_zero(int i) {
@@ -61,6 +69,11 @@ void DMDeviceCollection::set_callback_mode_all(CallbackMode callback_mode) {
     }
 }
 
+void DMDeviceCollection::set_callback_mode(int i, CallbackMode callback_mode) {
+    auto dm_device = get_dm_devices().at(i);
+    dm_device->set_callback_mode(callback_mode);
+}
+
 void DMDeviceCollection::query_param_one(int i, int RID) {
     auto dm_device = get_dm_devices().at(i);
     auto& motor = dm_device->get_motor();
@@ -86,9 +99,10 @@ void DMDeviceCollection::send_command_to_device(std::shared_ptr<DMCANDevice> dm_
 }
 
 void DMDeviceCollection::mit_control_one(int i, const MITParam& mit_param) {
+    auto dm_device = get_dm_devices().at(i);
     CANPacket mit_cmd =
-        CanPacketEncoder::create_mit_control_command(get_dm_devices()[i]->get_motor(), mit_param);
-    send_command_to_device(get_dm_devices()[i], mit_cmd);
+        CanPacketEncoder::create_mit_control_command(dm_device->get_motor(), mit_param);
+    send_command_to_device(dm_device, mit_cmd);
 }
 
 void DMDeviceCollection::mit_control_all(const std::vector<MITParam>& mit_params) {
@@ -98,9 +112,10 @@ void DMDeviceCollection::mit_control_all(const std::vector<MITParam>& mit_params
 }
 
 void DMDeviceCollection::posvel_control_one(int i, const PosVelParam& posvel_param) {
+    auto dm_device = get_dm_devices().at(i);
     CANPacket posvel_cmd = CanPacketEncoder::create_posvel_control_command(
-        get_dm_devices()[i]->get_motor(), posvel_param);
-    send_command_to_device(get_dm_devices()[i], posvel_cmd);
+        dm_device->get_motor(), posvel_param);
+    send_command_to_device(dm_device, posvel_cmd);
 }
 
 void DMDeviceCollection::posvel_control_all(const std::vector<PosVelParam>& posvel_params) {

@@ -12,8 +12,11 @@ public:
     virtual ~DMDeviceCollection() = default;
     // Common motor operations
     void enable_all();
+    void enable(int i);
     void disable_all();
+    void disable(int i);
     void set_callback_mode_all(CallbackMode callback_mode);
+    void set_callback_mode(int i, CallbackMode callback_mode);
 
     // Flash new zero position
     void set_zero(int i);

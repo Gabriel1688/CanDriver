@@ -95,5 +95,6 @@ inline constexpr std::array<LimitParam, static_cast<std::size_t>(MotorType::COUN
         {12.5, 280, 1},   // DMH3510
         {12.5, 45, 10},   // DMH6215
         {12.5, 45, 10}    // DMG6220
-    }};
+    }
+};
 }  // namespace openarm::damiao_motor
