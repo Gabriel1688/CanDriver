@@ -1,10 +1,7 @@
 #pragma once
-
 #include "../canbus/can_device.hpp"
-#include "../canbus/can_socket.hpp"
 #include "../canbus/common.h"
 #include "dm_motor.hpp"
-#include "dm_motor_control.hpp"
 
 namespace openarm::damiao_motor {
 enum CallbackMode {

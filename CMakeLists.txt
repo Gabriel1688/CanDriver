@@ -75,7 +75,7 @@ if(USE_FILE_SET_HEADERS)
            include/openarm/can/socket/openarm.hpp
            include/openarm/canbus/can_device.hpp
            include/openarm/canbus/can_device_collection.hpp
-          include/openarm/canbus/can_socket.hpp
+           include/openarm/canbus/can_socket.hpp
            include/openarm/canbus/common.h
            include/openarm/damiao_motor/dm_motor.hpp
            include/openarm/damiao_motor/dm_motor_constants.hpp
@@ -89,6 +89,8 @@ if(USE_FILE_SET_HEADERS)
 else()
   target_include_directories(
     openarm_can PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#need to resolve this dependency folder issue.
+                       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/cmake-build-debug/_deps/spdlog-src/include>
                        $<INSTALL_INTERFACE:include>)
   install(TARGETS openarm_can EXPORT openarm_can_export)
   install(DIRECTORY include/openarm TYPE INCLUDE)
@@ -102,16 +104,16 @@ install(
   NAMESPACE OpenArmCAN::
   FILE OpenArmCANTargets.cmake)
 include(CMakePackageConfigHelpers)
-configure_package_config_file(
-  OpenArmCANConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/OpenArmCANConfig.cmake
-  INSTALL_DESTINATION ${INSTALL_CMAKE_DIR})
-write_basic_package_version_file(
-  ${CMAKE_CURRENT_BINARY_DIR}/OpenArmCANVersion.cmake
-  VERSION ${PROJECT_VERSION}
-  COMPATIBILITY SameMajorVersion)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenArmCANConfig.cmake
-              ${CMAKE_CURRENT_BINARY_DIR}/OpenArmCANVersion.cmake
-        DESTINATION ${INSTALL_CMAKE_DIR})
+#configure_package_config_file(
+#  OpenArmCANConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/OpenArmCANConfig.cmake
+#  INSTALL_DESTINATION ${INSTALL_CMAKE_DIR})
+#write_basic_package_version_file(
+#  ${CMAKE_CURRENT_BINARY_DIR}/OpenArmCANVersion.cmake
+#  VERSION ${PROJECT_VERSION}
+#  COMPATIBILITY SameMajorVersion)
+#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenArmCANConfig.cmake
+#              ${CMAKE_CURRENT_BINARY_DIR}/OpenArmCANVersion.cmake
+#        DESTINATION ${INSTALL_CMAKE_DIR})
 
 # pkg-config package
 if(IS_ABSOLUTE "${CMAKE_INSTALL_INCLUDEDIR}")
@@ -124,10 +126,10 @@ if(IS_ABSOLUTE "${CMAKE_INSTALL_LIBDIR}")
 else()
   set(PKG_CONFIG_LIBDIR "\${prefix}/${CMAKE_INSTALL_LIBDIR}")
 endif()
-configure_file(openarm-can.pc.in ${CMAKE_CURRENT_BINARY_DIR}/openarm-can.pc
-               @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/openarm-can.pc
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+#configure_file(openarm-can.pc.in ${CMAKE_CURRENT_BINARY_DIR}/openarm-can.pc
+#               @ONLY)
+#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/openarm-can.pc
+#        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 add_executable(openarm-can-motor-check setup/motor_check.cpp)
 target_link_libraries(openarm-can-motor-check openarm_can)
@@ -151,6 +153,12 @@ install(
            setup/openarm-can-zero-position-calibration
   DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+add_executable(udpserver tools/udpserver.cpp)
+target_include_directories(
+        udpserver PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        #need to resolve this dependency folder issue.
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/cmake-build-debug/_deps/spdlog-src/include>
+        $<INSTALL_INTERFACE:include>)
 # Add tests
 if(BUILD_TESTING)
   # add_subdirectory(test)

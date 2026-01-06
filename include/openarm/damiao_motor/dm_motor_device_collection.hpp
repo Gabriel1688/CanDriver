@@ -1,20 +1,15 @@
 #pragma once
-
 #include <memory>
 #include <vector>
-
 #include "../canbus/can_device_collection.hpp"
-#include "dm_motor_constants.hpp"
 #include "dm_motor_control.hpp"
 #include "dm_motor_device.hpp"
 
 namespace openarm::damiao_motor {
-
 class DMDeviceCollection {
 public:
     DMDeviceCollection(canbus::CANSocket& can_socket);
     virtual ~DMDeviceCollection() = default;
-
     // Common motor operations
     void enable_all();
     void disable_all();

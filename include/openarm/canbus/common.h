@@ -1,6 +1,6 @@
 #ifndef OPENARM_CAN_COMMON_H
 #define OPENARM_CAN_COMMON_H
-
+#include <cstdint>
 #define CAN_MAX_DLC 8
 #define CAN_MAX_DLEN 8
 typedef unsigned char __u8;
@@ -22,5 +22,4 @@ struct can_frame_ex {
     uint8_t data[CAN_MAX_DLEN] __attribute__((aligned(8)));
 };
 #pragma pack(pop)
-
 #endif  // OPENARM_CAN_COMMON_H

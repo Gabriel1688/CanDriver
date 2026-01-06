@@ -3,12 +3,11 @@
 #include <cstdint>
 #include <map>
 #include <memory>
-#include <vector>
-
-#include "can_device.hpp"
-#include "can_socket.hpp"
+#include "common.h"
 
 namespace openarm::canbus {
+class CANDevice;
+class CANSocket;
 class CANDeviceCollection {
 public:
     CANDeviceCollection(canbus::CANSocket& can_socket);
@@ -18,9 +17,6 @@ public:
     void remove_device(const std::shared_ptr<CANDevice>& device);
     void dispatch_frame_callback(const can_frame& frame);
     const std::map<canid_t, std::shared_ptr<CANDevice>>& get_devices() const { return devices_; }
-    canbus::CANSocket& get_can_socket() const { return can_socket_; }
-    int get_socket_fd() const { return can_socket_.get_socket_fd(); }
-
 private:
     canbus::CANSocket& can_socket_;
     std::map<canid_t, std::shared_ptr<CANDevice>> devices_;

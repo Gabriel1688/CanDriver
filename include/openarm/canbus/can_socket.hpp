@@ -1,19 +1,16 @@
 #pragma once
-
-#include <stdexcept>
 #include <string>
 #include "common.h"
 #include <functional>
 #include <map>
 #include <pthread.h>
-#include <atomic>
 #include <mutex>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <memory>
 #include <condition_variable>
-
+#include <sys/socket.h>
 
 namespace openarm::canbus {
 
@@ -45,9 +42,6 @@ public:
 
     // read can_frame or canfd_frame
     bool read_can_frame(can_frame_ex& frame);
-
-    // check if data is available for reading (non-blocking)
-    bool is_data_available(int timeout_us = 100);
     void subscribe(const int32_t deviceId, const client_observer_t & observer);
 protected:
     bool initialize_socket(const std::string& interface);
@@ -62,6 +56,7 @@ protected:
      * the specific observer requested IP
      */
     void handlereceivedMsg(const can_frame_ex& frame, size_t msgSize);
+    struct sockaddr_in _server;
     std::string address;
     int port;
     int socket_fd_;

@@ -1,6 +1,6 @@
 #include <openarm/canbus/can_device_collection.hpp>
+#include <openarm/canbus/can_device.hpp>
 #include <openarm/canbus/can_socket.hpp>
-
 namespace openarm::canbus {
 
 CANDeviceCollection::CANDeviceCollection(CANSocket& can_socket) : can_socket_(can_socket) {
@@ -37,7 +37,6 @@ void CANDeviceCollection::add_device(const std::shared_ptr<CANDevice>& device) {
 
 void CANDeviceCollection::remove_device(const std::shared_ptr<CANDevice>& device) {
     if (!device) return;
-
     canid_t device_id = device->get_recv_can_id();
     auto it = devices_.find(device_id);
     if (it != devices_.end()) {
@@ -51,7 +50,6 @@ void CANDeviceCollection::dispatch_frame_callback(const can_frame& frame) {
     if (it != devices_.end()) {
         it->second->callback(frame);
     }
-    // Note: Silently ignore frames for unknown devices (this is normal in CAN
-    // networks)
+    // Note: Silently ignore frames for unknown devices (this is normal in CAN networks)
 }
 }  // namespace openarm::canbus

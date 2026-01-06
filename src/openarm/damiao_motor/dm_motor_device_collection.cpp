@@ -1,9 +1,9 @@
 #include <iostream>
 #include <openarm/canbus/common.h>
+#include <openarm/canbus/can_socket.hpp>
 #include <openarm/damiao_motor/dm_motor_device_collection.hpp>
 
 namespace openarm::damiao_motor {
-
 DMDeviceCollection::DMDeviceCollection(canbus::CANSocket& can_socket)
     : can_socket_(can_socket),
       can_packet_encoder_(std::make_unique<CanPacketEncoder>()),
@@ -43,6 +43,7 @@ void DMDeviceCollection::refresh_one(int i) {
     auto& motor = dm_device->get_motor();
     CANPacket refresh_packet = CanPacketEncoder::create_refresh_command(motor);
     send_command_to_device(dm_device, refresh_packet);
+    motor.wait_response();
 }
 
 void DMDeviceCollection::refresh_all() {
@@ -50,6 +51,7 @@ void DMDeviceCollection::refresh_all() {
         auto& motor = dm_device->get_motor();
         CANPacket refresh_packet = CanPacketEncoder::create_refresh_command(motor);
         send_command_to_device(dm_device, refresh_packet);
+        motor.wait_response();
     }
 }
 
@@ -60,9 +62,11 @@ void DMDeviceCollection::set_callback_mode_all(CallbackMode callback_mode) {
 }
 
 void DMDeviceCollection::query_param_one(int i, int RID) {
-    CANPacket param_query =
-        CanPacketEncoder::create_query_param_command(get_dm_devices()[i]->get_motor(), RID);
+    auto dm_device = get_dm_devices().at(i);
+    auto& motor = dm_device->get_motor();
+    CANPacket param_query = CanPacketEncoder::create_query_param_command(motor, RID);
     send_command_to_device(get_dm_devices()[i], param_query);
+    motor.wait_response();
 }
 
 void DMDeviceCollection::query_param_all(int RID) {
@@ -125,5 +129,4 @@ std::vector<std::shared_ptr<DMCANDevice>> DMDeviceCollection::get_dm_devices() c
     }
     return dm_devices;
 }
-
 }  // namespace openarm::damiao_motor

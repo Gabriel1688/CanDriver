@@ -14,9 +14,6 @@
 #include "spdlog/spdlog.h"
 
 namespace openarm::canbus {
-
-#define MAX_PACKET_SIZE 1500
-
 CANSocket::CANSocket(const std::string& interface)
     : socket_fd_(-1), interface_(interface) {
     address="127.0.0.1";
@@ -27,12 +24,10 @@ CANSocket::CANSocket(const std::string& interface)
 }
 
 CANSocket::~CANSocket() { cleanup(); }
-
 bool CANSocket::initialize_socket(const std::string& interface) {
-    // Create socket
-    struct sockaddr_in _server;
+    // Create UDP socket
     try {
-        socket_fd_ = socket(AF_INET , SOCK_STREAM , 0);
+        socket_fd_ = socket(AF_INET , SOCK_DGRAM,  IPPROTO_UDP);
         const int inetSuccess = inet_aton(address.c_str(), &_server.sin_addr);
 
         if(!inetSuccess) { // inet_addr failed to parse address
@@ -49,12 +44,6 @@ bool CANSocket::initialize_socket(const std::string& interface) {
         _server.sin_port = htons(port);
     } catch (const std::runtime_error& error) {
         std::cout << "server is already closed"<< error.what() << std::endl;
-        return false;
-    }
-
-    const int connectResult = connect(socket_fd_ , (struct sockaddr *)&_server , sizeof(_server));
-    if (connectResult ==  -1) {
-        std::cout << "server is already closed, "<< strerror(errno) << std::endl;
         return false;
     }
     isConnected_ = true;
@@ -81,17 +70,15 @@ void CANSocket::run() {
 
     /* Initialize variables for epoll */
     struct epoll_event ev;
-
-    int epfd = epoll_create(255);
+    int epfd = epoll_create(2);
     ev.data.fd = socket_fd_;
     ev.events = EPOLLIN;
     epoll_ctl(epfd, EPOLL_CTL_ADD, socket_fd_ , &ev);
 
-    struct epoll_event events[256];
-
+    struct epoll_event events[2];
     while (isConnected_)
     {
-        int ready = epoll_wait(epfd, events, 256, 20);  //20 milliseconds
+        int ready = epoll_wait(epfd, events, 2, -1);  //20 milliseconds
         if (ready < 0)
         {
             perror("epoll_wait error.");
@@ -107,7 +94,7 @@ void CANSocket::run() {
                 if (events[i].data.fd == socket_fd_)
                 {
                     can_frame_ex frame;
-                    ssize_t bytes_read = read(socket_fd_, &frame, sizeof(frame));
+                    ssize_t bytes_read = recvfrom(socket_fd_, &frame, sizeof(frame), 0, NULL, NULL);
                     if (bytes_read < 1) {
                         std::string errorMsg;
                         if (bytes_read == 0) {
@@ -136,7 +123,7 @@ void CANSocket::subscribe(const int32_t deviceId, const client_observer_t & obse
 void CANSocket::handlereceivedMsg(const can_frame_ex& msg, size_t msgSize) {
     can_frame frame;
     frame.can_id = __builtin_bswap32(msg.FrameId);
-    frame.can_dlc = msgSize -5;  //substract header and frameId, get only the payload
+    frame.can_dlc = msgSize - 5;  //substract header and frameId, get only the payload
     memcpy(frame.data,msg.data,frame.can_dlc);
 
     spdlog::info("------> {0:04x} : {1:02x}", frame.can_id, fmt::join(frame.data, " "));
@@ -159,27 +146,14 @@ void CANSocket::cleanup() {
         socket_fd_ = -1;
     }
 }
-
 bool CANSocket::write_can_frame(can_frame_ex& frame) {
-
     spdlog::info("<------ {0:04x} : {1:02x}", frame.FrameId, fmt::join(frame.data, " "));
     frame.FrameId = __builtin_bswap32(frame.FrameId);
-    return write(socket_fd_, &frame, sizeof(frame)) == sizeof(frame);
+    return sendto(socket_fd_, &frame, sizeof(frame),0,(struct sockaddr *) &_server, sizeof(_server)) == sizeof(frame);
 }
 
-bool CANSocket::is_data_available(int timeout_us) {
-    fd_set read_fds;
-    struct timeval timeout;
-
-    FD_ZERO(&read_fds);
-    FD_SET(socket_fd_, &read_fds);
-
-    timeout.tv_sec = timeout_us / 1000000;
-    timeout.tv_usec = (timeout_us % 1000000);
-
-    int result = select(socket_fd_ + 1, &read_fds, nullptr, nullptr, &timeout);
-
-    return (result > 0 && FD_ISSET(socket_fd_, &read_fds));
+bool CANSocket::read_can_frame(can_frame_ex& frame) {
+    ssize_t bytes_read = read(socket_fd_, &frame, sizeof(frame));
+    return bytes_read == sizeof(frame);
 }
-
 }  // namespace openarm::canbus
