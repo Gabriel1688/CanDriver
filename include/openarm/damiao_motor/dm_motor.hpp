@@ -9,7 +9,6 @@
 
 #include "dm_motor_constants.hpp"
 
-namespace openarm::damiao_motor {
 class Motor {
     friend class DMCANDevice;  // Allow MotorDeviceCan to access protected members
     friend class DMControl;
@@ -69,4 +68,3 @@ protected:
     std::shared_ptr<std::condition_variable> request_cv_;
     std::shared_ptr<std::atomic<bool>> completed_;
 };
-}  // namespace openarm::damiao_motor

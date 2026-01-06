@@ -22,7 +22,6 @@
 #include "arm_component.hpp"
 #include "gripper_component.hpp"
 
-namespace openarm::can::socket {
 class OpenArm {
 public:
     OpenArm(const std::string& can_interface);
@@ -31,17 +30,17 @@ public:
     std::string can_interface() const noexcept { return can_interface_; }
 
     // Component initialization
-    void init_arm_motors(const std::vector<damiao_motor::MotorType>& motor_types,
+    void init_arm_motors(const std::vector<MotorType>& motor_types,
                          const std::vector<uint32_t>& send_can_ids,
                          const std::vector<uint32_t>& recv_can_ids);
 
-    void init_gripper_motor(damiao_motor::MotorType motor_type, uint32_t send_can_id,
+    void init_gripper_motor(MotorType motor_type, uint32_t send_can_id,
                             uint32_t recv_can_id);
 
     // Component access
     ArmComponent& get_arm() { return *arm_; }
     GripperComponent& get_gripper() { return *gripper_; }
-    canbus::CANDeviceCollection& get_master_can_device_collection() {
+    CANDeviceCollection& get_master_can_device_collection() {
         return *master_can_device_collection_;
     }
 
@@ -55,17 +54,15 @@ public:
     // The timeout for reading from socket, set to timeout_us.
     // Tuning this value may improve the performance but should be done with caution.
     void recv_all(int timeout_us = 500);
-    void set_callback_mode_all(damiao_motor::CallbackMode callback_mode);
+    void set_callback_mode_all(CallbackMode callback_mode);
     void query_param_all(int RID);
 
 private:
     std::string can_interface_;
-    std::unique_ptr<canbus::CANSocket> can_socket_;
+    std::unique_ptr<CANSocket> can_socket_;
     std::unique_ptr<ArmComponent> arm_;
     std::unique_ptr<GripperComponent> gripper_;
-    std::unique_ptr<canbus::CANDeviceCollection> master_can_device_collection_;
-    std::vector<damiao_motor::DMDeviceCollection*> sub_dm_device_collections_;
-    void register_dm_device_collection(damiao_motor::DMDeviceCollection& device_collection);
+    std::unique_ptr<CANDeviceCollection> master_can_device_collection_;
+    std::vector<DMDeviceCollection*> sub_dm_device_collections_;
+    void register_dm_device_collection(DMDeviceCollection& device_collection);
 };
-
-}  // namespace openarm::can::socket

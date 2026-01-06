@@ -13,7 +13,6 @@
 #include <openarm/canbus/can_socket.hpp>
 #include "spdlog/spdlog.h"
 
-namespace openarm::canbus {
 CANSocket::CANSocket(const std::string& interface)
     : socket_fd_(-1), interface_(interface) {
     address="127.0.0.1";
@@ -156,4 +155,3 @@ bool CANSocket::read_can_frame(can_frame_ex& frame) {
     ssize_t bytes_read = read(socket_fd_, &frame, sizeof(frame));
     return bytes_read == sizeof(frame);
 }
-}  // namespace openarm::canbus

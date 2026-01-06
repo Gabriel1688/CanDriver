@@ -12,8 +12,6 @@
 #include <condition_variable>
 #include <sys/socket.h>
 
-namespace openarm::canbus {
-
 struct client_observer_t {
     int id = 0;
     std::function<void(const can_frame& frame)> incomingPacketHandler = nullptr;
@@ -66,5 +64,3 @@ protected:
     std::mutex _subscribersMtx;
     std::map<int32_t, client_observer_t> _subscribers;
 };
-
-}  // namespace openarm::canbus

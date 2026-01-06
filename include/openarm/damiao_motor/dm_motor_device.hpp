@@ -3,7 +3,6 @@
 #include "../canbus/common.h"
 #include "dm_motor.hpp"
 
-namespace openarm::damiao_motor {
 enum CallbackMode {
     STATE,
     PARAM,
@@ -11,7 +10,7 @@ enum CallbackMode {
     IGNORE
 };
 
-class DMCANDevice : public canbus::CANDevice {
+class DMCANDevice : public CANDevice {
 public:
     explicit DMCANDevice(Motor& motor, canid_t recv_can_mask);
     void callback(const can_frame& frame);
@@ -27,4 +26,3 @@ private:
     Motor& motor_;
     CallbackMode callback_mode_;
 };
-}  // namespace openarm::damiao_motor

@@ -3,12 +3,12 @@
 #include <openarm/canbus/can_socket.hpp>
 #include <openarm/damiao_motor/dm_motor_device_collection.hpp>
 
-namespace openarm::damiao_motor {
-DMDeviceCollection::DMDeviceCollection(canbus::CANSocket& can_socket)
+
+DMDeviceCollection::DMDeviceCollection(CANSocket& can_socket)
     : can_socket_(can_socket),
       can_packet_encoder_(std::make_unique<CanPacketEncoder>()),
       can_packet_decoder_(std::make_unique<CanPacketDecoder>()),
-      device_collection_(std::make_unique<canbus::CANDeviceCollection>(can_socket_)) {}
+      device_collection_(std::make_unique<CANDeviceCollection>(can_socket_)) {}
 
 void DMDeviceCollection::enable_all() {
     for(int i = 0; i < get_dm_devices().size(); i ++) {
@@ -144,4 +144,3 @@ std::vector<std::shared_ptr<DMCANDevice>> DMDeviceCollection::get_dm_devices() c
     }
     return dm_devices;
 }
-}  // namespace openarm::damiao_motor

@@ -2,9 +2,8 @@
 #include <openarm/damiao_motor/dm_motor_control.hpp>
 #include <openarm/damiao_motor/dm_motor_device.hpp>
 
-namespace openarm::damiao_motor {
 DMCANDevice::DMCANDevice(Motor& motor, canid_t recv_can_mask)
-    : canbus::CANDevice(motor.get_send_can_id(), motor.get_recv_can_id(), recv_can_mask),
+    : CANDevice(motor.get_send_can_id(), motor.get_recv_can_id(), recv_can_mask),
       motor_(motor),
       callback_mode_(CallbackMode::STATE) {}
 
@@ -54,4 +53,3 @@ can_frame_ex DMCANDevice::create_can_frame(canid_t send_can_id, std::vector<uint
     std::copy(data.begin(), data.end(), frame.data);
     return frame;
 }
-}  // namespace openarm::damiao_motor

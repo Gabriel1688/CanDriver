@@ -7,7 +7,6 @@
 #include "dm_motor.hpp"
 #include "dm_motor_constants.hpp"
 
-namespace openarm::damiao_motor {
 // Forward declarations
 class Motor;
 struct ParamResult {
@@ -72,4 +71,3 @@ private:
     static uint32_t uint8s_to_uint32(uint8_t byte1, uint8_t byte2, uint8_t byte3, uint8_t byte4);
     static bool is_in_ranges(int number);
 };
-}  // namespace openarm::damiao_motor

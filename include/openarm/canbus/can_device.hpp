@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include "common.h"
-namespace openarm::canbus {
+
 class CANDevice {
 public:
     explicit CANDevice(canid_t send_can_id, canid_t recv_can_id, canid_t recv_can_mask)
@@ -23,4 +23,3 @@ protected:
     // mask for receiving
     canid_t recv_can_mask_ =0x000007FFU; // CAN_SFF_MASK;
 };
-}  // namespace openarm::canbus

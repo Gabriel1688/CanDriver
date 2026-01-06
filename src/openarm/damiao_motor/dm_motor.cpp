@@ -4,7 +4,6 @@
 #include <string>
 #include "spdlog/spdlog.h"
 #include <unistd.h>
-namespace openarm::damiao_motor {
 
 // Constructor
 Motor::Motor(MotorType motor_type, uint32_t send_can_id, uint32_t recv_can_id)
@@ -78,4 +77,3 @@ LimitParam Motor::get_limit_param(MotorType motor_type) {
     }
     return MOTOR_LIMIT_PARAMS[index];
 }
-}  // namespace openarm::damiao_motor

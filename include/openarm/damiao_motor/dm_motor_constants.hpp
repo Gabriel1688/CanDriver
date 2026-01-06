@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace openarm::damiao_motor {
 enum class MotorType : uint8_t {
     DM3507 = 0,
     DM4310 = 1,
@@ -97,4 +96,3 @@ inline constexpr std::array<LimitParam, static_cast<std::size_t>(MotorType::COUN
         {12.5, 45, 10}    // DMG6220
     }
 };
-}  // namespace openarm::damiao_motor

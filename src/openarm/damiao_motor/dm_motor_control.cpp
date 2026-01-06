@@ -4,8 +4,6 @@
 #include <openarm/damiao_motor/dm_motor_constants.hpp>
 #include <openarm/damiao_motor/dm_motor_control.hpp>
 
-namespace openarm::damiao_motor {
-
 // Command creation methods (return data array, can_id handled externally)
 CANPacket CanPacketEncoder::create_enable_command(const Motor& motor) {
     return {motor.get_send_can_id(), pack_command_data(0xFC)};
@@ -176,4 +174,3 @@ bool CanPacketDecoder::is_in_ranges(int number) {
     return (7 <= number && number <= 10) || (13 <= number && number <= 16) ||
            (35 <= number && number <= 36);
 }
-}  // namespace openarm::damiao_motor

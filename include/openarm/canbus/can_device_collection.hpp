@@ -5,12 +5,11 @@
 #include <memory>
 #include "common.h"
 
-namespace openarm::canbus {
 class CANDevice;
 class CANSocket;
 class CANDeviceCollection {
 public:
-    CANDeviceCollection(canbus::CANSocket& can_socket);
+    CANDeviceCollection(CANSocket& can_socket);
     ~CANDeviceCollection();
 
     void add_device(const std::shared_ptr<CANDevice>& device);
@@ -27,7 +26,6 @@ public:
         }
     }
 private:
-    canbus::CANSocket& can_socket_;
+    CANSocket& can_socket_;
     std::map<canid_t, std::shared_ptr<CANDevice>> devices_;
 };
-}  // namespace openarm::canbus

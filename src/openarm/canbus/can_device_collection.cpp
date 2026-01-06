@@ -1,8 +1,6 @@
 #include <openarm/canbus/can_device_collection.hpp>
 #include <openarm/canbus/can_device.hpp>
 #include <openarm/canbus/can_socket.hpp>
-namespace openarm::canbus {
-
 CANDeviceCollection::CANDeviceCollection(CANSocket& can_socket) : can_socket_(can_socket) {
     // configure and register to can socket
     client_observer_t observer;
@@ -52,4 +50,3 @@ void CANDeviceCollection::dispatch_frame_callback(const can_frame& frame) {
     }
     // Note: Silently ignore frames for unknown devices (this is normal in CAN networks)
 }
-}  // namespace openarm::canbus
